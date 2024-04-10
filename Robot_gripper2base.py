@@ -6,6 +6,7 @@ import math
 import numpy as np
 # R_gripper2base: Ma trận xoay giữa Gripper và Base (Tính toán từ vị trí x,y,z,roll,pitch,yall của Robot)
 # t_gripper2base: Ma trận dịch chuyển giữa Gripper và Base (Tính toán từ vị trí x,y,z,roll,pitch,yall của Robot)
+# Don vi: mm
 
 index_folder = 1
 
