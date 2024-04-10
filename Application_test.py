@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QFileDialog
 
 from YoloDetection import *
 from Guide_test import *
-# Test source
 
 
 class MainWindow(QMainWindow):
