@@ -15,23 +15,23 @@ class YoloDetection:
     def __init__(self):
         # Load model
         # train là yolov5nu (epoch=10 và batch=2) Data_1
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train/weights/best.pt")
         # train2 là yolov8n (epoch=10 và batch=2) Data_1
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train2/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train2/weights/best.pt")
         # train3 là yolov5nu (epoch=10 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train3/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train3/weights/best.pt")
         # train4 là yolov8n (epoch=10 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train4/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train4/weights/best.pt")
         # train5 là yolov5nu (epoch=20 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train5/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train5/weights/best.pt")
         # train6 là yolov8n (epoch=20 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train6/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train6/weights/best.pt")
         # train7 là yolov8n (epoch=30 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train7/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train7/weights/best.pt")
         # train8 là yolov8n (epoch=40 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train8/weights/best.pt")
+        # self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train8/weights/best.pt")
         # train9 là yolov8n (epoch=20 và batch=2) Data_1
-        self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train9/weights/best.pt")
+        self.model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
 
         # Load class
         self.license_class = [0, 1, 2, 3, 4]
