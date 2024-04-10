@@ -1,0 +1,10 @@
+path: D:/A_Project_DK-TDH/PyCharm_Project/Object_Detection_1
+train: images/train
+val: images/val
+
+names:
+  0: Duck
+  1: Frog
+  2: Fish
+  3: Turtle
+  4: Octopus
