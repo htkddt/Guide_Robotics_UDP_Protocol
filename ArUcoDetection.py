@@ -1,7 +1,6 @@
 import sys
 import cv2
 import numpy as np
-# ArUco tool
 
 
 def ARUCO_Detection(frame, Int_matrix, detector, markerLength):
