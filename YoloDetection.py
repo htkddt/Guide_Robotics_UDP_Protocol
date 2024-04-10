@@ -9,7 +9,6 @@ from imutils import perspective
 from imutils import contours
 
 from ultralytics import YOLO
-# Yolo tool
 
 
 class YoloDetection:
