@@ -1,7 +1,6 @@
 import sys
 import cv2
 import numpy as np
-# Color tool
 
 
 def COLOR_objectdetection(frame):
