@@ -9,7 +9,6 @@ from imutils import perspective
 from imutils import contours
 
 from RealsenseCamera import *
-# PCA algorithm
 
 
 def drawAxis(img, p_, q_, colour, scale):
