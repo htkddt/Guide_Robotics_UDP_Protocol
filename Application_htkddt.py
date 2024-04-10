@@ -21,7 +21,6 @@ from scipy.spatial.transform import Rotation
 from RealsenseCamera import *
 from YoloDetection import *
 from Guide_htkddt import Ui_MainWindow
-# main program
 
 """
 # Khai báo MainWindow() loại 1
