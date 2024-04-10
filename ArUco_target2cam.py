@@ -6,8 +6,8 @@ import scipy
 import math
 import imutils
 from RealsenseCamera import *
-# R_target2cam: Ma trận xoay giữa Aruco và Camera (Kết quả detect Aruco bằng thư viện Opencv)
-# t_target2cam Ma trận dịch chuyển giữa Aruco và Camera tại tâm của Aruco (Kết quả detect Aruco bằng thư viện Opencv)
+# R_target2cam (3x3): Ma trận xoay giữa Aruco và Camera (Opencv)
+# t_target2cam (3x1): Ma trận dịch chuyển giữa Aruco và Camera tại tâm của Aruco (Opencv)
 
 index_folder = 1
 
