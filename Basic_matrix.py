@@ -1,7 +1,6 @@
 import sys
 import os
 import numpy as np
-# Basic python
 
 # image_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Image\\Data'
 # image_files = [f for f in os.listdir(image_folder_path) if f.lower().endswith('.jpg')]
