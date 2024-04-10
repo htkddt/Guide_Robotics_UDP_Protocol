@@ -2,7 +2,7 @@ import sys
 import os
 import cv2
 import numpy as np
-# R_cam2gripper, t_cam2gripper, method = cv.calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam)
+# R_cam2gripper, t_cam2gripper = cv.calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam)
 
 # Eye-in-hand:
 # R_gripper2base = R_gripper2base
