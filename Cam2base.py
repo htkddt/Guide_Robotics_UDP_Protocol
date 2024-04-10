@@ -4,7 +4,6 @@ import numpy as np
 
 # Old : Int_matrix = np.array([[608.32574463, 0, 330.66174316], [0, 606.69873047, 242.11862183], [0, 0, 1]])
 # New : Int_matrix = np.array([[608.33, 0, 330.66], [0, 606.7, 242.12], [0, 0, 1]])
-# Calibration tool
 
 index_folder = 1
 
