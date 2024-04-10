@@ -13,7 +13,6 @@ from imutils import contours
 
 from ultralytics import YOLO
 from RealsenseCamera import *
-# YOLO algorithm
 
 
 def drawAxis(img, p_, q_, colour, scale):
