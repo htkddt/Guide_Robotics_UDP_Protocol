@@ -71,7 +71,7 @@ def getOrientation(pts, img):
 rs = RealsenseCamera()
 
 # Load model
-model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Demo/runs/detect/train8/weights/best.pt")
+model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
 
 # Load class
 license_class = [0, 1, 2, 3, 4]
