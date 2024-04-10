@@ -1,5 +1,4 @@
 from ultralytics import YOLO
-# Train model
 
 # Load model
 # model = YOLO("yolov5nu.pt")
