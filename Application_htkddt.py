@@ -87,6 +87,7 @@ class MainWindow(QMainWindow):
         self.detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
 
         self.socket = RobotSocket()
+        self.conveyor = ConveyorSocket()
 
         self.serial = SerialProcess()
         self.serial.start()
@@ -112,7 +113,7 @@ class MainWindow(QMainWindow):
 
         self.uic.btn_Get_Position.clicked.connect(self.get_position_action)
 
-        self.uic.btn_Conveyor.clicked.connect(self.get_status_action)
+        self.uic.btn_Conveyor.clicked.connect(self.conveyor_action)
 
         self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
 
@@ -173,11 +174,13 @@ class MainWindow(QMainWindow):
             self.socket.robot_address(IP, Port)
             self.socket.status = 0
             self.socket.start()
+            self.conveyor.start()
             self.uic.lb_Connect_Disconnect.setText("Connected")
 
         elif self.uic.btn_Connect_Disconnect.text() == "Disconnect":
             self.uic.btn_Connect_Disconnect.setText("Connect")
             self.socket.disconnect()
+            self.conveyor.disconnect()
             self.uic.lb_Connect_Disconnect.setText("Disconnected")
 
     def open_close_action(self):
@@ -886,12 +889,42 @@ class MainWindow(QMainWindow):
 
             status += 1
 
-    def get_status_action(self):
+    def conveyor_action(self):
         if self.uic.btn_Conveyor.text() == "Conveyor ON":
-            self.flag_Conveyor = True
+            frame = bytes([0x11,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00, 0x00,
+                           0x00, 0x00, 0x00, 0x00,
+                           0x00, 0x08,
+                           0x20,
+                           0x00,
+                           0x00,
+                           0x00, 0x00,
+                           0x00, 0x01])
+            self.conveyor.send_function(frame)
+            self.conveyor.received_function()
             self.uic.btn_Conveyor.setText("Conveyor OFF")
         elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
-            self.flag_Conveyor = False
+            frame = bytes([0x11,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00,
+                           0x00, 0x00,
+                           0x00, 0x00, 0x00, 0x00,
+                           0x00, 0x08,
+                           0x20,
+                           0x00,
+                           0x00,
+                           0x00, 0x00,
+                           0x00, 0x00])
+            self.conveyor.send_function(frame)
+            self.conveyor.received_function()
             self.uic.btn_Conveyor.setText("Conveyor ON")
 
     def serial_process_action(self, Pulse):
@@ -1163,7 +1196,7 @@ class RobotSocket(QThread):
         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        print("Socket Finished Init")
+        print("Robot Socket Finished Init")
 
     def run(self):
         # Thiết lập kết nối
@@ -1172,7 +1205,7 @@ class RobotSocket(QThread):
             # Đối số của lệnh self.s.bind() là một đối số kiểu tuple (Tương tự như list hay array) chứa IP và Port
             # print("IP: " + str(self.IP) + '\n' + "Port: " + str(int(self.Port)))
             self.s.connect((self.IP, self.Port))
-            print("Status Robot Connected" + '\n')
+            print("\nStatus Robot Connected")
             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
             self.flag_connected = True
         except Exception as e:
@@ -1230,6 +1263,44 @@ class RobotSocket(QThread):
         frame_data = self.s.recv(1024)
         print("Data Received: " + str(frame_data) + '\n')
         return frame_data
+
+
+class ConveyorSocket(QThread):
+    def __init__(self):
+        super(ConveyorSocket, self).__init__()
+        self.IP = '192.168.1.1'
+        self.Port = 10001
+
+        # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
+        # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print("Conveyor Socket Finished Init")
+
+    def run(self):
+        # Thiết lập kết nối
+        try:
+            # print("Status Robot Connected")
+            # Đối số của lệnh self.s.bind() là một đối số kiểu tuple (Tương tự như list hay array) chứa IP và Port
+            # print("IP: " + str(self.IP) + '\n' + "Port: " + str(int(self.Port)))
+            self.s.connect((self.IP, self.Port))
+            print("\nStatus Conveyor Connected")
+            print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
+        except Exception as e:
+            print("Error:", e)
+
+    def disconnect(self):
+        if self.s:
+            self.s.close()
+            print("Status Conveyor Disconnected")
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def send_function(self, frame_data):
+        self.s.sendto(frame_data, (self.IP, self.Port))
+        print("Data Send: " + str(frame_data))
+
+    def received_function(self):
+        frame_data, _ = self.s.recvfrom(4096)
+        print("Data Received: " + str(frame_data) + '\n')
 
 
 class CameraThread(QThread):
