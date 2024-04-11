@@ -85,6 +85,12 @@ ang = None
 R, t = Cam2base.read_matrix()
 T_cam2base = np.vstack(((np.hstack((R, t))), ([0, 0, 0, 1.0])))
 
+# Cropp frame
+min_X = 100
+max_X = 300
+min_Y = 275
+max_Y = 420
+
 background = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\Background.jpg')
 background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
 
@@ -93,12 +99,11 @@ while True:
 
     ret, color_frame, depth_frame, _, _, _ = rs.get_frame_stream()
 
-    if ret:
-        tl_point = (100, 275)
-        br_point = (450, 420)
-        cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
-        cropped_frame = color_frame[tl_point[1]:br_point[1], tl_point[0]:br_point[0]]
+    tl_point = (min_X, min_Y)
+    br_point = (max_X, max_Y)
+    cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
 
+    if ret:
         gray = cv2.cvtColor(color_frame, cv2.COLOR_BGR2GRAY)
         difference_frame = cv2.absdiff(gray, background_gray)
         binary_frame = cv2.inRange(difference_frame, 25, 255, cv2.THRESH_BINARY)
@@ -123,8 +128,8 @@ while True:
             x1, y1, x2, y2, score, class_id = result
             point_center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
 
-            if ((point_center[0] > tl_point[0]) & (point_center[0] < br_point[0]) &
-                    (point_center[1] > tl_point[1]) & (point_center[1] < br_point[1])):
+            if ((point_center[0] > min_X) & (point_center[0] < max_X) &
+                    (point_center[1] > min_Y) & (point_center[1] < max_Y)):
 
                 # point_center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
                 top_left = (int(x1), int(y1))
@@ -189,7 +194,7 @@ while True:
                         cY = int(M["m01"] / M["m00"])
 
                         if (cX > top_left[0]) & (cX < bottom_right[0]) & (cY > top_left[1]) & (cY < bottom_right[1]):
-                            ang, point_center = getOrientation(c, color_frame)
+                            ang, _ = getOrientation(c, color_frame)
                             ang = (ang * 180 / math.pi) + 90.0
 
                             if ang > 90.0:
@@ -197,9 +202,11 @@ while True:
 
                             print("Angle = " + str(ang))
 
+            else:
+                point_center = None
+
         cv2.imshow("Color frame", color_frame)
         cv2.imshow("Binary frame", binary_frame)
-        cv2.imshow("Cropped frame", cropped_frame)
 
     end_time_1 = time.time()
 
