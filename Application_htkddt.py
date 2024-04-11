@@ -925,22 +925,26 @@ class MainWindow(QMainWindow):
         print("Status detect: " + str(flag_last_id))
         print("u = " + str(point_u))
         print("v = " + str(point_v))
+        print("angle = " + str(angle))
 
         rve = None
         tve = None
 
-        """
-        if obj_detect:
-            if self.flag_Enable_Job:
-                self.flag_Data_Position = True
-            else:
-                self.flag_Data_Position = False
-            self.uic.lb_Object.setText("Object: True")
-        else:
-            self.uic.lb_Object.setText("Object: False")
-        """
+        # if obj_detect:
+        #     if self.flag_Enable_Job:
+        #         self.flag_Data_Position = True
+        #     else:
+        #         self.flag_Data_Position = False
+        #     self.uic.lb_Object.setText("Object: True")
+        # else:
+        #     self.uic.lb_Object.setText("Object: False")
 
-        if self.flag_Enable_Job:
+        # if self.flag_Enable_Job:
+        #     self.flag_Data_Position = True
+        # else:
+        #     self.flag_Data_Position = False
+
+        if flag_last_id:
             self.flag_Data_Position = True
         else:
             self.flag_Data_Position = False
@@ -1078,11 +1082,19 @@ class MainWindow(QMainWindow):
                         self.Pitch_ = 0 * 10000
                         self.Yaw_ = int(angle * 10000)
 
+                        print("X = " + str(self.X_))
+                        print("Y = " + str(self.Y_))
+                        print("Z = " + str(self.Z_))
+                        print("Roll = " + str(self.Roll_))
+                        print("Pitch = " + str(self.Pitch_))
+                        print("Yaw = " + str(self.Yaw_))
+
                         self.flag_Data_Position = False
 
                         if self.flag_Process:
-                            self.move_job_action()
-                            self.flag_Process = False
+                            if self.flag_Enable_Job:
+                                self.move_job_action()
+                                self.flag_Process = False
 
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
             self.uic.Display_frame.setPixmap(QPixmap.fromImage(pixmap))
@@ -1278,14 +1290,12 @@ class CameraThread(QThread):
                 # Tìm contours
                 contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-                """
                 # Tìm pixel khác 0
-                pixel_cnt = cv2.countNonZero(binary_frame)
-                if pixel_cnt > 1000:
-                    obj = True
-                else:
-                    obj = False
-                """
+                # pixel_cnt = cv2.countNonZero(binary_frame)
+                # if pixel_cnt > 1000:
+                #     obj = True
+                # else:
+                #     obj = False
 
                 if self.flag_Detect_YOLO:
                     color_frame, last_id, _, point_center, top_left, bottom_right = self.yolo.getObject(color_frame)
@@ -1295,13 +1305,11 @@ class CameraThread(QThread):
 
                     else:
 
-                        """
-                        angle, point_center = self.getOrientation(c, color_frame)
-                        angle = (angle * 180 / math.pi) + 90.0
-
-                        if angle > 90.0:
-                            angle = angle - 180
-                        """
+                        # angle, point_center = self.getOrientation(c, color_frame)
+                        # angle = (angle * 180 / math.pi) + 90.0
+                        #
+                        # if angle > 90.0:
+                        #     angle = angle - 180
 
                         for c in contour_box:
                             area = cv2.contourArea(c)
@@ -1329,58 +1337,59 @@ class CameraThread(QThread):
                         u = 0
                         v = 0
 
-                """
-                for c in contour_box:
-                    area = cv2.contourArea(c)
-                    if area < 2000:
-                        continue
-                    else:
-                        M = cv2.moments(c)
-                        cX = int(M["m10"] / M["m00"])
-                        cY = int(M["m01"] / M["m00"])
+                else:
+                    flag_last_id = False
 
-                        if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
-
-                            if self.flag_Detect_YOLO:
-                                color_frame, last_id, _, _, top_left, bottom_right = self.yolo.getObject(color_frame)
-
-                                if last_id is None:
-                                    u = 0
-                                    v = 0
-                                    angle = 0
-
-                                else:
-                                    angle, point_center = self.getOrientation(c, color_frame)
-                                    angle = (angle * 180 / math.pi) + 90.0
-
-                                    if angle > 90.0:
-                                        angle = angle - 180
-
-                                    u = point_center[0]
-                                    v = point_center[1]
-
-                                    print("Angle = " + str(angle) + '\n' +
-                                          "u = " + str(u) + '\n' +
-                                          "v = " + str(v))
-
-                            elif self.flag_Detect_COLOR:
-                                color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
-                                color_frame, u, v = ColorDetection.COLOR_objectdetection(color_frame)
-                                color_frame = cv2.cvtColor(color_frame, cv2.COLOR_RGB2BGR)
-                                if (u is None) & (v is None):
-                                    u = 0
-                                    v = 0
-                                    angle = 0
-
-                            angle, _ = self.getOrientation(c, color_frame)
-                            angle = (angle * 180 / math.pi) + 90.0
-
-                            if angle > 90.0:
-                                angle = angle - 180
+                # for c in contour_box:
+                #     area = cv2.contourArea(c)
+                #     if area < 2000:
+                #         continue
+                #     else:
+                #         M = cv2.moments(c)
+                #         cX = int(M["m10"] / M["m00"])
+                #         cY = int(M["m01"] / M["m00"])
+                #
+                #         if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
+                #
+                #             if self.flag_Detect_YOLO:
+                #                 color_frame, last_id, _, _, top_left, bottom_right = self.yolo.getObject(color_frame)
+                #
+                #                 if last_id is None:
+                #                     u = 0
+                #                     v = 0
+                #                     angle = 0
+                #
+                #                 else:
+                #                     angle, point_center = self.getOrientation(c, color_frame)
+                #                     angle = (angle * 180 / math.pi) + 90.0
+                #
+                #                     if angle > 90.0:
+                #                         angle = angle - 180
+                #
+                #                     u = point_center[0]
+                #                     v = point_center[1]
+                #
+                #                     print("Angle = " + str(angle) + '\n' +
+                #                           "u = " + str(u) + '\n' +
+                #                           "v = " + str(v))
+                #
+                #             elif self.flag_Detect_COLOR:
+                #                 color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
+                #                 color_frame, u, v = ColorDetection.COLOR_objectdetection(color_frame)
+                #                 color_frame = cv2.cvtColor(color_frame, cv2.COLOR_RGB2BGR)
+                #                 if (u is None) & (v is None):
+                #                     u = 0
+                #                     v = 0
+                #                     angle = 0
+                #
+                #             angle, _ = self.getOrientation(c, color_frame)
+                #             angle = (angle * 180 / math.pi) + 90.0
+                #
+                #             if angle > 90.0:
+                #                 angle = angle - 180
 
                             # u = point_center[0]
                             # v = point_center[1]
-                """
 
                 if flag_last_id:
                     u = point_center[0]
@@ -1438,7 +1447,7 @@ class CameraThread(QThread):
 
         # Store the center of the object
         cntr = (int(mean[0, 0]), int(mean[0, 1]))
-        cv2.circle(img, cntr, 3, (255, 0, 255), 2)
+        # cv2.circle(img, cntr, 3, (255, 0, 255), 2)
 
         p1 = (cntr[0] + 0.02 * eigenvectors[0, 0] * eigenvalues[0, 0],
               cntr[1] + 0.02 * eigenvectors[0, 1] * eigenvalues[0, 0])
