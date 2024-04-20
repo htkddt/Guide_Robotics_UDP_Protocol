@@ -13,6 +13,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QFileDialog
 
 from YoloDetection import *
+from YoloSegmentation import *
 from Guide_test import *
 
 
@@ -23,17 +24,19 @@ class MainWindow(QMainWindow):
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self)
 
-        self.yolo = YoloDetection()
+        self.yoloDetect = YoloDetection()
+        self.yoloSegment = YoloSegmentation()
 
         self.frame = None
-
-        background = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\Background.jpg')
-        self.background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
-
+        self.binary = None
         self.contour_box = None
 
-        self.tl_point = (100, 275)
-        self.br_point = (300, 420)
+        # self.tl_point = (100, 275)
+        # self.br_point = (300, 420)
+
+        width = 640
+        height = 480
+        self.black_frame = np.zeros((height, width), dtype=np.uint8)
 
         self.uic.btn_Open.clicked.connect(self.open_action)
         self.uic.btn_Detect.clicked.connect(self.detect_action)
@@ -46,11 +49,6 @@ class MainWindow(QMainWindow):
                                               options=opt)
         if file:
             cap = cv2.imread(file)
-            cv2.rectangle(cap, self.tl_point, self.br_point, (0, 0, 0), 1)
-            gray = cv2.cvtColor(cap, cv2.COLOR_BGR2GRAY)
-            difference_frame = cv2.absdiff(gray, self.background_gray)
-            binary = cv2.inRange(difference_frame, 25, 255, cv2.THRESH_BINARY)
-            self.contour_box, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             self.frame = cv2.cvtColor(cap, cv2.COLOR_BGR2RGB)
 
@@ -58,43 +56,21 @@ class MainWindow(QMainWindow):
             self.uic.Image_frame_1.setPixmap(QPixmap.fromImage(pixmap))
 
     def detect_action(self):
-        img = cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR)
-        # img, last_id, _, top_left, bottom_right = self.yolo.getObject(self.frame)
-        for c in self.contour_box:
-            area = cv2.contourArea(c)
-            if area < 1000:
-                continue
-            else:
-                M = cv2.moments(c)
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-
-                if (cX > self.tl_point[0]) & (cX < self.br_point[0]) & (cY > self.tl_point[1]) & (cY < self.br_point[1]):
-                    img, last_id, _, _, top_left, bottom_right = self.yolo.getObject(img)
-
-                    if last_id is None:
-                        u = 0
-                        v = 0
-                        angle = 0
-                        print("No Detection")
-
-                    else:
-                        angle, point_center = self.getOrientation(c, img)
-                        angle = (angle * 180 / math.pi) + 90.0
-
-                        if angle > 90.0:
-                            angle = angle - 180
-
-                        print("Class id = " + str(last_id) + '\n' +
-                              "Angle = " + str(angle) + '\n' +
-                              str(point_center[0]) + '\n' +
-                              str(point_center[1]))
-
-                else:
-                    continue
-
+        conv = cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR)
+        img, last_id, _, _, top_left, bottom_right = self.yoloDetect.getObject(conv)
         self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        binary_float32 = self.yoloSegment.getSegment(conv)
+        if binary_float32 is None:
+            self.binary = self.black_frame
+        else:
+            binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+            self.binary = binary_normalized.astype(np.uint8)
+
         pixmap = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], QImage.Format_RGB888)
+        self.uic.Image_frame_1.setPixmap(QPixmap.fromImage(pixmap))
+
+        pixmap = QImage(self.binary, self.binary.shape[1], self.binary.shape[0], QImage.Format_Indexed8)
         self.uic.Image_frame_2.setPixmap(QPixmap.fromImage(pixmap))
 
     def drawAxis(self, img, p_, q_, colour, scale):
