@@ -6,13 +6,13 @@ import cv2
 tl_point = (150, 275)
 br_point = (470, 420)
 
-image_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_2\\images\\val'
+image_folder_path = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_2\\images\\val'
 image_files = [f for f in os.listdir(image_folder_path) if f.lower().endswith('.jpg')]
 
-result_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_3\\images\\val'
+result_folder_path = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_3\\images\\val'
 
 for index in range(1, len(image_files) + 1):
-    image = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_2\\images\\val\\image_({index}).jpg'
+    image = f'D:\\A_Project\\PyCharm_Project\\Object_Detection_2\\images\\val\\image_({index}).jpg'
 
     # print(str(index))
     # print(str(image))
