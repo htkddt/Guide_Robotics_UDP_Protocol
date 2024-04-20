@@ -14,10 +14,10 @@ import numpy as np
 
 index_folder = 1
 
-gripper2base_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})'
+gripper2base_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})'
 gripper2base_files = [f for f in os.listdir(gripper2base_folder_path) if f.endswith('.txt')]
 
-target2cam_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})'
+target2cam_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})'
 target2cam_files = [f for f in os.listdir(target2cam_folder_path) if f.endswith('.txt')]
 
 
@@ -25,7 +25,7 @@ def gripper2base_read():
     R_list = []
     t_list = []
     for index in range(1, len(gripper2base_files) + 1):
-        txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})\\gripper2base_({index}).txt'
+        txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})\\gripper2base_({index}).txt'
 
         with open(txt, 'r') as file:
             line = file.readlines()
@@ -51,7 +51,7 @@ def target2cam_read():
     R_list = []
     t_list = []
     for index in range(1, len(target2cam_files) + 1):
-        txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})\\target2cam_({index}).txt'
+        txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})\\target2cam_({index}).txt'
 
         with open(txt, 'r') as file:
             line = file.readlines()
@@ -82,8 +82,8 @@ R_cam2base, t_cam2base = cv2.calibrateHandEye(R_gripper2base, t_gripper2base, R_
 
 print("R_cam2base = \n" + str(R_cam2base) + '\n' + "t_cam2base = \n" + str(t_cam2base))
 
-matrix_save_path_txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Matrix\\Data_({index_folder})'
-value_save_path_txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Value\\Data_({index_folder})'
+matrix_save_path_txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Matrix\\Data_({index_folder})'
+value_save_path_txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Value\\Data_({index_folder})'
 
 if not os.path.exists(matrix_save_path_txt):
     os.makedirs(matrix_save_path_txt)
