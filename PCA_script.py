@@ -59,13 +59,13 @@ def getOrientation(pts, img):
     return angle, cntr
 
 
-image = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\PCA_Images\\image_(9).jpg')
+image = cv2.imread('D:\\A_Project\\PyCharm_Project\\PCA_Images\\image_(9).jpg')
 
 # Convert image to grayscale
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 # Load Background
-background = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\Background.jpg')
+background = cv2.imread('D:\\A_Project\\PyCharm_Project\\Background.jpg')
 background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
 
 # Background Subtraction
