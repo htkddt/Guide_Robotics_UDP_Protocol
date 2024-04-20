@@ -2,7 +2,7 @@ import sys
 import os
 import numpy as np
 
-# image_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Image\\Data'
+# image_folder_path = 'D:\\A_Project\\PyCharm_Project\\Image\\Data'
 # image_files = [f for f in os.listdir(image_folder_path) if f.lower().endswith('.jpg')]
 
 # Để nhân 2 ma trận ta dùng toán tử
