@@ -9,7 +9,7 @@ index_folder = 1
 
 
 def read_matrix():
-    txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Value\\Data_({index_folder})\\Result_cam2base_value.txt'
+    txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Value\\Data_({index_folder})\\Result_cam2base_value.txt'
 
     with open(txt, 'r') as file:
         line = file.readlines()
