@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
 from scipy.spatial.transform import Rotation
 from RealsenseCamera import *
 from YoloDetection import *
+from YoloSegmentation import *
 from Guide_htkddt import Ui_MainWindow
 
 """
@@ -46,6 +47,9 @@ class MainWindow(QMainWindow):
 
         self.index_data = 315
         self.index_folder = 2
+
+        self.uic.lb_Gripper.setText("Gripper: Place")
+        self.uic.txt_dt.setText("0")
 
         self.Int_matrix = None
         self.T_cam2base = None
@@ -90,7 +94,7 @@ class MainWindow(QMainWindow):
         self.conveyor = ConveyorSocket()
 
         self.serial = SerialProcess()
-        self.serial.start()
+        # self.serial.start()
         self.serial.message.connect(self.update_serial)
         self.method = 0
 
@@ -117,7 +121,6 @@ class MainWindow(QMainWindow):
 
         self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
 
-        self.dt = 0
         self.uic.btn_Start.clicked.connect(self.start_time)
         self.run_time = 0
         self.uic.btn_Stop.clicked.connect(self.stop_time)
@@ -954,7 +957,7 @@ class MainWindow(QMainWindow):
         self.end_time = time.time()
         self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
 
-    def update_frame(self, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
+    def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
         print("Status detect: " + str(flag_last_id))
         print("u = " + str(point_u))
         print("v = " + str(point_v))
@@ -963,22 +966,16 @@ class MainWindow(QMainWindow):
         rve = None
         tve = None
 
-        # if obj_detect:
-        #     if self.flag_Enable_Job:
-        #         self.flag_Data_Position = True
-        #     else:
-        #         self.flag_Data_Position = False
-        #     self.uic.lb_Object.setText("Object: True")
-        # else:
-        #     self.uic.lb_Object.setText("Object: False")
-
-        # if self.flag_Enable_Job:
-        #     self.flag_Data_Position = True
-        # else:
-        #     self.flag_Data_Position = False
+        if obj_detect:
+            self.uic.lb_Object.setText("Object: True")
+        else:
+            self.uic.lb_Object.setText("Object: False")
 
         if flag_last_id:
-            self.flag_Data_Position = True
+            if self.flag_Enable_Job:
+                self.flag_Data_Position = True
+            else:
+                self.flag_Data_Position = False
         else:
             self.flag_Data_Position = False
 
@@ -986,7 +983,7 @@ class MainWindow(QMainWindow):
             frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
 
             if self.flag_Capture_Background:
-                save_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project'
+                save_path = 'D:\\A_Project\\PyCharm_Project'
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
                 file_name = 'Background.jpg'
@@ -996,7 +993,7 @@ class MainWindow(QMainWindow):
 
             if self.flag_Capture_Object:
                 self.index_data += 1
-                save_path_object = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_2'
+                save_path_object = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_2'
                 if not os.path.exists(save_path_object):
                     os.makedirs(save_path_object)
                 object_file_name = f'image_({self.index_data}).jpg'
@@ -1304,31 +1301,32 @@ class ConveyorSocket(QThread):
 
 
 class CameraThread(QThread):
-    image = pyqtSignal(bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
+    image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
 
     def __init__(self):
         super(CameraThread, self).__init__()
         self.rs = RealsenseCamera()
-        self.yolo = YoloDetection()
+        self.yoloDetect = YoloDetection()
+        self.yoloSegment = YoloSegmentation()
         print("Camera Finished Init")
 
     def run(self):
         binary_frame = None
+        obj = None
         flag_last_id = False
         point_center = None
         u = 0
         v = 0
         angle = 0
-        # obj = False
+
+        width = 640
+        height = 480
+        black_frame = np.zeros((height, width), dtype=np.uint8)
 
         while self.running:
             ret, color_frame, depth_frame, _, _, _ = self.rs.get_frame_stream()
 
             if ret:
-                # Load background
-                background = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\Background.jpg')
-                background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
-
                 # Vẽ vùng làm việc
                 mean = 200
                 min_X = 100
@@ -1340,51 +1338,27 @@ class CameraThread(QThread):
                 br_point = (max_X, max_Y)
                 cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
 
-                # Chuyển đổi khung ảnh sang ảnh xám
-                gray = cv2.cvtColor(color_frame, cv2.COLOR_BGR2GRAY)
+                binary_float32 = self.yoloSegment.getSegment(color_frame)
 
-                # Trừ ảnh: frame hiện tại - background
-                frame = cv2.absdiff(gray, background_gray)
-
-                # Ngưỡng hóa ảnh
-                binary_frame = cv2.inRange(frame, 25, 255, cv2.THRESH_BINARY)
-
-                # Khai báo kernel
-                kernel = np.ones((3, 3), np.uint8)
-
-                # Erosion frame
-                binary_frame = cv2.erode(binary_frame, kernel, iterations=3)
-
-                # Dilation frame
-                binary_frame = cv2.dilate(binary_frame, kernel, iterations=5)
-
-                # Tìm contours
-                contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-                # Tìm pixel khác 0
-                # pixel_cnt = cv2.countNonZero(binary_frame)
-                # if pixel_cnt > 1000:
-                #     obj = True
-                # else:
-                #     obj = False
+                if binary_float32 is None:
+                    binary_frame = black_frame
+                    obj = False
+                else:
+                    binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+                    binary_frame = binary_normalized.astype(np.uint8)
+                    obj = True
 
                 if self.flag_Detect_YOLO:
-                    color_frame, last_id, _, point_center, top_left, bottom_right = self.yolo.getObject(color_frame)
+                    color_frame, last_id, _, point_center, top_left, bottom_right = self.yoloDetect.getObject(color_frame)
 
                     if last_id is None:
                         flag_last_id = False
 
                     else:
-
-                        # angle, point_center = self.getOrientation(c, color_frame)
-                        # angle = (angle * 180 / math.pi) + 90.0
-                        #
-                        # if angle > 90.0:
-                        #     angle = angle - 180
-
+                        contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                         for c in contour_box:
                             area = cv2.contourArea(c)
-                            if area < 2000:
+                            if area < 1000:
                                 continue
                             else:
                                 M = cv2.moments(c)
@@ -1411,57 +1385,6 @@ class CameraThread(QThread):
                 else:
                     flag_last_id = False
 
-                # for c in contour_box:
-                #     area = cv2.contourArea(c)
-                #     if area < 2000:
-                #         continue
-                #     else:
-                #         M = cv2.moments(c)
-                #         cX = int(M["m10"] / M["m00"])
-                #         cY = int(M["m01"] / M["m00"])
-                #
-                #         if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
-                #
-                #             if self.flag_Detect_YOLO:
-                #                 color_frame, last_id, _, _, top_left, bottom_right = self.yolo.getObject(color_frame)
-                #
-                #                 if last_id is None:
-                #                     u = 0
-                #                     v = 0
-                #                     angle = 0
-                #
-                #                 else:
-                #                     angle, point_center = self.getOrientation(c, color_frame)
-                #                     angle = (angle * 180 / math.pi) + 90.0
-                #
-                #                     if angle > 90.0:
-                #                         angle = angle - 180
-                #
-                #                     u = point_center[0]
-                #                     v = point_center[1]
-                #
-                #                     print("Angle = " + str(angle) + '\n' +
-                #                           "u = " + str(u) + '\n' +
-                #                           "v = " + str(v))
-                #
-                #             elif self.flag_Detect_COLOR:
-                #                 color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
-                #                 color_frame, u, v = ColorDetection.COLOR_objectdetection(color_frame)
-                #                 color_frame = cv2.cvtColor(color_frame, cv2.COLOR_RGB2BGR)
-                #                 if (u is None) & (v is None):
-                #                     u = 0
-                #                     v = 0
-                #                     angle = 0
-                #
-                #             angle, _ = self.getOrientation(c, color_frame)
-                #             angle = (angle * 180 / math.pi) + 90.0
-                #
-                #             if angle > 90.0:
-                #                 angle = angle - 180
-
-                            # u = point_center[0]
-                            # v = point_center[1]
-
                 if flag_last_id:
                     u = point_center[0]
                     v = point_center[1]
@@ -1470,7 +1393,7 @@ class CameraThread(QThread):
                     v = 0
                     angle = 0
 
-                self.image.emit(flag_last_id, color_frame, binary_frame, depth_frame, u, v, angle)
+                self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, u, v, angle)
 
     def matrix(self):
         _, _, _, matrix, _, dist = self.rs.get_frame_stream()
@@ -1525,8 +1448,8 @@ class CameraThread(QThread):
         p2 = (cntr[0] - 0.02 * eigenvectors[1, 0] * eigenvalues[1, 0],
               cntr[1] - 0.02 * eigenvectors[1, 1] * eigenvalues[1, 0])
 
-        # self.drawAxis(img, cntr, p1, (255, 0, 0), 3)
-        # self.drawAxis(img, cntr, p2, (255, 255, 255), 7)
+        self.drawAxis(img, cntr, p1, (255, 0, 0), 3)
+        self.drawAxis(img, cntr, p2, (255, 255, 255), 7)
 
         angle = math.atan2(eigenvectors[0, 1], eigenvectors[0, 0])  # orientation in radians
 
@@ -1541,14 +1464,14 @@ class SerialProcess(QThread):
 
     def __init__(self):
         super(SerialProcess, self).__init__()
-        self.serialPort = serial.Serial()
-        self.serialPort.port = 'COM4'
-        self.serialPort.open()
-        self.Data_received = []
-        self.flag_DataAvailable = False
-        self.STX = bytes([0x02])
-        self.ETX = bytes([0x03])
-        print("Serial Port is Open")
+        # self.serialPort = serial.Serial()
+        # self.serialPort.port = 'COM4'
+        # self.serialPort.open()
+        # self.Data_received = []
+        # self.flag_DataAvailable = False
+        # self.STX = bytes([0x02])
+        # self.ETX = bytes([0x03])
+        # print("Serial Port is Open")
 
     def run(self):
         while True:
