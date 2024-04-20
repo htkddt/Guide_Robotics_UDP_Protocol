@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1448</width>
-    <height>545</height>
+    <width>1311</width>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QLabel" name="Image_frame_1">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>10</y>
+      <x>10</x>
+      <y>60</y>
       <width>640</width>
       <height>480</height>
      </rect>
@@ -36,7 +36,7 @@
    <widget class="QPushButton" name="btn_Open">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>470</x>
       <y>10</y>
       <width>111</width>
       <height>41</height>
@@ -54,8 +54,8 @@
    <widget class="QPushButton" name="btn_Close">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>150</y>
+      <x>730</x>
+      <y>10</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -72,8 +72,8 @@
    <widget class="QPushButton" name="btn_Detect">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>80</y>
+      <x>600</x>
+      <y>10</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -90,8 +90,8 @@
    <widget class="QLabel" name="Image_frame_2">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>10</y>
+      <x>660</x>
+      <y>60</y>
       <width>640</width>
       <height>480</height>
      </rect>
@@ -112,7 +112,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1448</width>
+     <width>1311</width>
      <height>26</height>
     </rect>
    </property>
