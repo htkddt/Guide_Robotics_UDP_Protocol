@@ -8,10 +8,10 @@ Int_matrix = np.array([[608.32574463, 0, 330.66174316],
                        [0, 606.69873047, 242.11862183],
                        [0, 0, 1]])
 
-position_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_(2)'
+position_folder_path = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_(2)'
 position_files = [f for f in os.listdir(position_folder_path) if f.endswith('.txt')]
 
-image_folder_path = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)'
+image_folder_path = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)'
 image_files = [f for f in os.listdir(image_folder_path) if f.lower().endswith('.jpg')]
 
 object_list = []
@@ -22,7 +22,7 @@ grid_points = np.zeros((grid_size[0] * grid_size[1], 3), np.float32)
 grid_points[:, :2] = np.mgrid[0:grid_size[0], 0:grid_size[1]].T.reshape(-1, 2)
 
 for index in range(1, len(image_files) + 1):
-    image = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)\\image_({index}).jpg'
+    image = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)\\image_({index}).jpg'
     print("Path: " + str(image) + '\n')
     img = cv2.imread(image)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
