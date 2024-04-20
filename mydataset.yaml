@@ -1,4 +1,4 @@
-path: D:/A_Project_DK-TDH/PyCharm_Project/Object_Detection_1
+path: D:/A_Project/PyCharm_Project/Segmentation_Object
 train: images/train
 val: images/val
 
