@@ -12,6 +12,8 @@ from imutils import perspective
 from imutils import contours
 
 from ultralytics import YOLO
+from YoloSegmentation import *
+from YoloDetection import *
 from RealsenseCamera import *
 
 
@@ -70,14 +72,20 @@ def getOrientation(pts, img):
 # Load camera
 rs = RealsenseCamera()
 
+# Load model detect
+yoloDetect = YoloDetection()
+
+# Load model segment
+yoloSegment = YoloSegmentation()
+
 # Load model
-model = YOLO("D:/A_Project_DK-TDH/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
+# model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
 
 # Load class
-license_class = [0, 1, 2, 3, 4]
+# license_class = [0, 1, 2, 3, 4]
 
-results_list = {}
-frame_nr = -1
+# results_list = {}
+# frame_nr = -1
 point_center = None
 ang = None
 
@@ -91,123 +99,59 @@ max_X = 300
 min_Y = 275
 max_Y = 420
 
-background = cv2.imread('D:\\A_Project_DK-TDH\\PyCharm_Project\\Background.jpg')
-background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
+width = 640
+height = 480
+black_frame = np.zeros((height, width), dtype=np.uint8)
 
 while True:
     start_time = time.time()
 
     ret, color_frame, depth_frame, _, _, _ = rs.get_frame_stream()
 
-    tl_point = (min_X, min_Y)
-    br_point = (max_X, max_Y)
-    cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
+    # tl_point = (min_X, min_Y)
+    # br_point = (max_X, max_Y)
+    # cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
 
     if ret:
-        gray = cv2.cvtColor(color_frame, cv2.COLOR_BGR2GRAY)
-        difference_frame = cv2.absdiff(gray, background_gray)
-        binary_frame = cv2.inRange(difference_frame, 25, 255, cv2.THRESH_BINARY)
-        contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        binary_float32 = yoloSegment.getSegment(color_frame)
+        color_frame, _, _, _, _, _ = yoloDetect.getObject(color_frame)
 
-        # Yolo
-        frame_nr += 1
-        results_list[frame_nr] = {}
+        if binary_float32 is not None:
+            binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+            binary_frame = binary_normalized.astype(np.uint8)
+            contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Detect
-        license_results = model(color_frame)[0]
-        license_plates = []
+            for c in contour_box:
+                area = cv2.contourArea(c)
+                if area < 1000:
+                    continue
+                else:
+                    M = cv2.moments(c)
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
 
-        for result in license_results.boxes.data.tolist():
-            x1, y1, x2, y2, score, class_id = result
+                    # if (cX > top_left[0]) & (cX < bottom_right[0]) & (cY > top_left[1]) & (cY < bottom_right[1]):
+                    #     ang, _ = getOrientation(c, color_frame)
+                    #     ang = (ang * 180 / math.pi) + 90.0
+                    #
+                    #     if ang > 90.0:
+                    #         ang = ang - 180
+                    #
+                    #     print("Angle = " + str(ang))
 
-            if int(class_id) in license_class:
-                license_plates.append([x1, y1, x2, y2, score, class_id])
+                    ang, _ = getOrientation(c, color_frame)
+                    ang = (ang * 180 / math.pi) + 90.0
 
-        # Draw bounding boxes on the image
-        for result in license_plates:
-            x1, y1, x2, y2, score, class_id = result
-            point_center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
+                    if ang > 90.0:
+                        ang = ang - 180
 
-            if ((point_center[0] > min_X) & (point_center[0] < max_X) &
-                    (point_center[1] > min_Y) & (point_center[1] < max_Y)):
+                    print("Angle = " + str(ang))
 
-                # point_center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
-                top_left = (int(x1), int(y1))
-                bottom_right = (int(x2), int(y2))
+            cv2.imshow("Binary frame", binary_frame)
+        else:
+            cv2.imshow("Binary frame", black_frame)
 
-                # cv2.circle(color_frame, point_center, 3, (0, 0, 0), -1)
-                cv2.circle(color_frame, top_left, 3, (0, 0, 0), 2)
-                cv2.circle(color_frame, bottom_right, 3, (0, 0, 0), 2)
-
-                if int(class_id) == 0:
-                    cv2.rectangle(color_frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 255), 2)
-
-                    cv2.putText(color_frame, str(round(score, 2)), (int(x1 + 35), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 255), 1, cv2.LINE_AA)
-
-                    cv2.putText(color_frame, license_results.names[int(class_id)].upper(), (int(x1), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 255), 1, cv2.LINE_AA)
-
-                elif int(class_id) == 1:
-                    cv2.rectangle(color_frame, (int(x1), int(y1)), (int(x2), int(y2)), (1, 185, 75), 2)
-
-                    cv2.putText(color_frame, str(round(score, 2)), (int(x1 + 35), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (1, 185, 75), 1, cv2.LINE_AA)
-
-                    cv2.putText(color_frame, license_results.names[int(class_id)].upper(), (int(x1), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (1, 185, 75), 1, cv2.LINE_AA)
-
-                elif int(class_id) == 2:
-                    cv2.rectangle(color_frame, (int(x1), int(y1)), (int(x2), int(y2)), (2, 88, 230), 2)
-
-                    cv2.putText(color_frame, str(round(score, 2)), (int(x1 + 30), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (2, 88, 230), 1, cv2.LINE_AA)
-
-                    cv2.putText(color_frame, license_results.names[int(class_id)].upper(), (int(x1), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (2, 88, 230), 1, cv2.LINE_AA)
-
-                elif int(class_id) == 3:
-                    cv2.rectangle(color_frame, (int(x1), int(y1)), (int(x2), int(y2)), (167, 72, 217), 2)
-
-                    cv2.putText(color_frame, str(round(score, 2)), (int(x1 + 45), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (167, 72, 217), 1, cv2.LINE_AA)
-
-                    cv2.putText(color_frame, license_results.names[int(class_id)].upper(), (int(x1), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (167, 72, 217), 1, cv2.LINE_AA)
-
-                elif int(class_id) == 4:
-                    cv2.rectangle(color_frame, (int(x1), int(y1)), (int(x2), int(y2)), (1, 39, 205), 2)
-
-                    cv2.putText(color_frame, str(round(score, 2)), (int(x1 + 55), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (1, 39, 205), 1, cv2.LINE_AA)
-
-                    cv2.putText(color_frame, license_results.names[int(class_id)].upper(), (int(x1), int(y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (1, 39, 205), 1, cv2.LINE_AA)
-
-                for c in contour_box:
-                    area = cv2.contourArea(c)
-                    if area < 1000:
-                        continue
-                    else:
-                        M = cv2.moments(c)
-                        cX = int(M["m10"] / M["m00"])
-                        cY = int(M["m01"] / M["m00"])
-
-                        if (cX > top_left[0]) & (cX < bottom_right[0]) & (cY > top_left[1]) & (cY < bottom_right[1]):
-                            ang, _ = getOrientation(c, color_frame)
-                            ang = (ang * 180 / math.pi) + 90.0
-
-                            if ang > 90.0:
-                                ang = ang - 180
-
-                            print("Angle = " + str(ang))
-
-            else:
-                point_center = None
-
-        cv2.imshow("Color frame", color_frame)
-        cv2.imshow("Binary frame", binary_frame)
-
+    cv2.imshow("Color frame", color_frame)
     end_time_1 = time.time()
 
     print("FPS model = " + str(1 / (end_time_1 - start_time)) + " (Hz)")
