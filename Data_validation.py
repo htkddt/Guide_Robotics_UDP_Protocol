@@ -5,12 +5,12 @@ import shutil
 # Test source //
 
 # Đường dẫn đến thư mục chứa ảnh ban đầu
-source_folder = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_2\\images\\train'
-# source_folder = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)'
+source_folder = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_2\\images\\train'
+# source_folder = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_(2)'
 
 # Đường dẫn đến thư mục mới
-destination_folder = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Object_Detection_2\\images\\val'
-# destination_folder = 'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Test'
+destination_folder = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_2\\images\\val'
+# destination_folder = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Test'
 
 # Lấy danh sách tất cả các tệp trong thư mục ban đầu
 all_files = os.listdir(source_folder)
