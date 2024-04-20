@@ -13,10 +13,10 @@ index_folder = 1
 
 Int_matrix = np.array([[608.33, 0, 330.66], [0, 606.7, 242.12], [0, 0, 1]])
 
-image_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_({index_folder})'
+image_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_({index_folder})'
 image_files = [f for f in os.listdir(image_folder_path) if f.lower().endswith('.jpg')]
 
-position_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})'
+position_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})'
 position_files = [f for f in os.listdir(position_folder_path) if f.endswith('.txt')]
 
 # Khởi tạo ArUco dictionary
@@ -28,12 +28,12 @@ arucoParams = cv2.aruco.DetectorParameters()
 # Khởi tạo đối tượng ArUcoDetector
 # detector = cv2.aruco.ArucoDetector(arucoDict, arucoParams)
 
-result_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Target2cam\\Data_({index_folder})'
-value_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})'
+result_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Target2cam\\Data_({index_folder})'
+value_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})'
 
 for index in range(1, len(image_files) + 1):
-    image = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_({index_folder})\\image_({index}).jpg'
-    txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})\\position_({index}).txt'
+    image = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Image\\Data_({index_folder})\\image_({index}).jpg'
+    txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})\\position_({index}).txt'
 
     img = cv2.imread(image)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
