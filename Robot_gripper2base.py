@@ -35,14 +35,14 @@ def transform_rotation(method, Roll, Pitch, Yaw):
     return rotation
 
 
-position_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})'
+position_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})'
 position_files = [f for f in os.listdir(position_folder_path) if f.endswith('.txt')]
 
-result_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Gripper2base\\Data_({index_folder})'
-value_folder_path = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})'
+result_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Gripper2base\\Data_({index_folder})'
+value_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})'
 
 for index in range(1, len(position_files) + 1):
-    txt = f'D:\\A_Project_DK-TDH\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})\\position_({index}).txt'
+    txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Data_({index_folder})\\position_({index}).txt'
 
     with open(txt, 'r') as file:
         line = file.readlines()
