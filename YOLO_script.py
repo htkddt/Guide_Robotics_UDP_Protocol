@@ -78,14 +78,6 @@ yoloDetect = YoloDetection()
 # Load model segment
 yoloSegment = YoloSegmentation()
 
-# Load model
-# model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
-
-# Load class
-# license_class = [0, 1, 2, 3, 4]
-
-# results_list = {}
-# frame_nr = -1
 point_center = None
 ang = None
 
@@ -93,11 +85,14 @@ ang = None
 R, t = Cam2base.read_matrix()
 T_cam2base = np.vstack(((np.hstack((R, t))), ([0, 0, 0, 1.0])))
 
-# Cropp frame
+# Detect area
 min_X = 100
 max_X = 300
 min_Y = 275
 max_Y = 420
+
+tl_point = (min_X, min_Y)
+br_point = (max_X, max_Y)
 
 width = 640
 height = 480
@@ -108,13 +103,11 @@ while True:
 
     ret, color_frame, depth_frame, _, _, _ = rs.get_frame_stream()
 
-    # tl_point = (min_X, min_Y)
-    # br_point = (max_X, max_Y)
-    # cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
-
     if ret:
+        cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
+
         binary_float32 = yoloSegment.getSegment(color_frame)
-        color_frame, _, _, _, _, _ = yoloDetect.getObject(color_frame)
+        color_frame, _, _, _, _, _, _ = yoloDetect.getObject(color_frame)
 
         if binary_float32 is not None:
             binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
@@ -130,15 +123,6 @@ while True:
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
 
-                    # if (cX > top_left[0]) & (cX < bottom_right[0]) & (cY > top_left[1]) & (cY < bottom_right[1]):
-                    #     ang, _ = getOrientation(c, color_frame)
-                    #     ang = (ang * 180 / math.pi) + 90.0
-                    #
-                    #     if ang > 90.0:
-                    #         ang = ang - 180
-                    #
-                    #     print("Angle = " + str(ang))
-
                     ang, _ = getOrientation(c, color_frame)
                     ang = (ang * 180 / math.pi) + 90.0
 
@@ -151,7 +135,8 @@ while True:
         else:
             cv2.imshow("Binary frame", black_frame)
 
-    cv2.imshow("Color frame", color_frame)
+        cv2.imshow("Color frame", color_frame)
+
     end_time_1 = time.time()
 
     print("FPS model = " + str(1 / (end_time_1 - start_time)) + " (Hz)")
