@@ -1,8 +1,8 @@
 task: detect
 mode: train
-model: yolov5nu.pt
+model: D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train/weights/last.pt
 data: mydataset.yaml
-epochs: 10
+epochs: 20
 patience: 50
 batch: 2
 imgsz: 640
