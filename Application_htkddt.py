@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
         self.index_data = 315
         self.index_folder = 2
 
-        self.uic.lb_Gripper.setText("Gripper: Place")
+        self.uic.lb_Gripper.setText("Gripper: None")
         self.uic.txt_dt.setText("0")
 
         self.Int_matrix = None
@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
         self.conveyor = ConveyorSocket()
 
         self.serial = SerialProcess()
-        # self.serial.start()
+        self.serial.start()
         self.serial.message.connect(self.update_serial)
         self.method = 0
 
@@ -298,8 +298,12 @@ class MainWindow(QMainWindow):
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
                     self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4)
+                    self.set_byte_action(0, 1)
+                    self.set_byte_action(0, 2)
+                    self.set_byte_action(0, 3)
+                    self.set_byte_action(0, 4)
                     self.set_byte_action(1, 0)
-                    self.serial_process_action(90)
+                    self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
             self.uic.btn_Servo.setText("Servo Off")
@@ -309,6 +313,7 @@ class MainWindow(QMainWindow):
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
             self.socket.send_function(frame)
             self.socket.received_function()
+            self.set_byte_action(0, 0)
             self.timer.stop()
             self.uic.btn_Servo.setText("Servo On")
 
@@ -735,7 +740,7 @@ class MainWindow(QMainWindow):
                 self.set_byte_action(1, 1)
                 self.start_job_function()
             self.flag_Enable_Job = True
-            self.serial_process_action(90)
+            self.serial_process_action(80)
             self.uic.btn_Move_Job.setText("RUN JOB")
 
         elif self.uic.btn_Move_Job.text() == "RUN JOB":
@@ -760,7 +765,10 @@ class MainWindow(QMainWindow):
         self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
         self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
         self.set_byte_action(1, 4)
-        self.go_home_action()
+        self.set_byte_action(0, 1)
+        self.set_byte_action(0, 2)
+        self.set_byte_action(0, 3)
+        # self.go_home_action()
 
     def set_byte_action(self, Data, Ins):
         # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
@@ -1001,30 +1009,30 @@ class MainWindow(QMainWindow):
                 self.flag_Capture_Object = False
                 self.uic.lb_Index.setText("Image_(" + str(self.index_data) + ")")
 
-            if self.flag_Conveyor:
-                if (point_u != 0) & (point_v != 0):
-                    Xc, Yc, Zc, depth_value = self.camera.point(point_u, point_v)
-
-                    Wc = np.array([[Xc],
-                                   [Yc],
-                                   [Zc],
-                                   [1.0]])
-                    Wr = self.T_cam2base.dot(Wc)
-
-                    self.X_ = Wr[0][0] * 1000 + 5000
-                    self.Y_ = Wr[1][0] * 1000 + (-(Wr[1][0] * 1000)) - 50000
-                    self.Z_ = Wr[2][0] * 1000
-                    self.Roll_ = 180 * 10000
-                    self.Pitch_ = 0 * 10000
-                    self.Yaw_ = int(angle * 10000)
-
-                    if obj_detect:
-                        print("\n\nX = " + str(self.X_) + '\n' +
-                              "Y = " + str(self.Y_) + '\n' +
-                              "Z = " + str(self.Z_) + '\n' +
-                              "Roll = " + str(self.Roll_) + '\n' +
-                              "Pitch = " + str(self.Pitch_) + '\n' +
-                              "Yaw = " + str(self.Yaw_))
+            # if self.flag_Conveyor:
+            #     if (point_u != 0) & (point_v != 0):
+            #         Xc, Yc, Zc, depth_value = self.camera.point(point_u, point_v)
+            #
+            #         Wc = np.array([[Xc],
+            #                        [Yc],
+            #                        [Zc],
+            #                        [1.0]])
+            #         Wr = self.T_cam2base.dot(Wc)
+            #
+            #         self.X_ = Wr[0][0] * 1000 + 5000
+            #         self.Y_ = Wr[1][0] * 1000 + (-(Wr[1][0] * 1000)) - 50000
+            #         self.Z_ = Wr[2][0] * 1000
+            #         self.Roll_ = 180 * 10000
+            #         self.Pitch_ = 0 * 10000
+            #         self.Yaw_ = int(angle * 10000)
+            #
+            #         if obj_detect:
+            #             print("\n\nX = " + str(self.X_) + '\n' +
+            #                   "Y = " + str(self.Y_) + '\n' +
+            #                   "Z = " + str(self.Z_) + '\n' +
+            #                   "Roll = " + str(self.Roll_) + '\n' +
+            #                   "Pitch = " + str(self.Pitch_) + '\n' +
+            #                   "Yaw = " + str(self.Yaw_))
 
             if self.flag_Detect_ArUco:
                 frame, rve, tve, _, u, v = ArUcoDetection.ARUCO_Detection(frame, self.Int_matrix, self.detector, 65)
@@ -1105,9 +1113,9 @@ class MainWindow(QMainWindow):
                                        [1.0]])
                         Wr = self.T_cam2base.dot(Wc)
 
-                        self.X_ = Wr[0][0] * 1000 + 10000
-                        self.Y_ = Wr[1][0] * 1000 + 75000
-                        self.Z_ = Wr[2][0] * 1000 - 5000
+                        self.X_ = Wr[0][0] * 1000
+                        self.Y_ = Wr[1][0] * 1000
+                        self.Z_ = Wr[2][0] * 1000
                         self.Roll_ = 180 * 10000
                         self.Pitch_ = 0 * 10000
                         self.Yaw_ = int(angle * 10000)
@@ -1166,7 +1174,7 @@ class MainWindow(QMainWindow):
                 elif status == 3:
                     self.uic.lb_Gripper.setText("Gripper: Place")
                     self.method = 5
-                    self.serial_process_action(90)
+                    self.serial_process_action(80)
                     self.timer.stop()
             self.flag_Select = True
 
@@ -1276,9 +1284,6 @@ class ConveyorSocket(QThread):
     def run(self):
         # Thiết lập kết nối
         try:
-            # print("Status Robot Connected")
-            # Đối số của lệnh self.s.bind() là một đối số kiểu tuple (Tương tự như list hay array) chứa IP và Port
-            # print("IP: " + str(self.IP) + '\n' + "Port: " + str(int(self.Port)))
             self.s.connect((self.IP, self.Port))
             print("\nStatus Conveyor Connected")
             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
@@ -1349,30 +1354,34 @@ class CameraThread(QThread):
                     obj = True
 
                 if self.flag_Detect_YOLO:
-                    color_frame, last_id, _, point_center, top_left, bottom_right = self.yoloDetect.getObject(color_frame)
+                    color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(color_frame)
 
                     if last_id is None:
                         flag_last_id = False
 
                     else:
-                        contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                        for c in contour_box:
-                            area = cv2.contourArea(c)
-                            if area < 1000:
-                                continue
-                            else:
-                                M = cv2.moments(c)
-                                cX = int(M["m10"] / M["m00"])
-                                cY = int(M["m01"] / M["m00"])
+                        if point_center[0] > mean:
+                            contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                            for c in contour_box:
+                                area = cv2.contourArea(c)
+                                if area < 1000:
+                                    continue
+                                else:
+                                    M = cv2.moments(c)
+                                    cX = int(M["m10"] / M["m00"])
+                                    cY = int(M["m01"] / M["m00"])
 
-                                if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
-                                    angle, _ = self.getOrientation(c, color_frame)
-                                    angle = (angle * 180 / math.pi) + 90.0
+                                    if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
+                                        angle, _ = self.getOrientation(c, color_frame)
+                                        angle = (angle * 180 / math.pi) + 90.0
 
-                                    if angle > 90.0:
-                                        angle = angle - 180
+                                        if angle > 90.0:
+                                            angle = angle - 180
 
-                        flag_last_id = True
+                            flag_last_id = True
+
+                        else:
+                            flag_last_id = False
 
                 elif self.flag_Detect_COLOR:
                     color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
@@ -1464,14 +1473,14 @@ class SerialProcess(QThread):
 
     def __init__(self):
         super(SerialProcess, self).__init__()
-        # self.serialPort = serial.Serial()
-        # self.serialPort.port = 'COM4'
-        # self.serialPort.open()
-        # self.Data_received = []
-        # self.flag_DataAvailable = False
-        # self.STX = bytes([0x02])
-        # self.ETX = bytes([0x03])
-        # print("Serial Port is Open")
+        self.serialPort = serial.Serial()
+        self.serialPort.port = 'COM4'
+        self.serialPort.open()
+        self.Data_received = []
+        self.flag_DataAvailable = False
+        self.STX = bytes([0x02])
+        self.ETX = bytes([0x03])
+        print("Serial Port is Open")
 
     def run(self):
         while True:
