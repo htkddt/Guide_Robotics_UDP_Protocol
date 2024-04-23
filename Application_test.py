@@ -31,9 +31,6 @@ class MainWindow(QMainWindow):
         self.binary = None
         self.contour_box = None
 
-        # self.tl_point = (100, 275)
-        # self.br_point = (300, 420)
-
         width = 640
         height = 480
         self.black_frame = np.zeros((height, width), dtype=np.uint8)
@@ -57,7 +54,7 @@ class MainWindow(QMainWindow):
 
     def detect_action(self):
         conv = cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR)
-        img, last_id, _, _, top_left, bottom_right = self.yoloDetect.getObject(conv)
+        img, last_id, _, _, top_left, bottom_right, _ = self.yoloDetect.getObject(conv)
         self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         binary_float32 = self.yoloSegment.getSegment(conv)
