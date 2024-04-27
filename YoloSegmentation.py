@@ -13,8 +13,10 @@ from ultralytics import YOLO
 class YoloSegmentation:
     def __init__(self):
         # Load model
-        # train là yolov8n-seg (epoch=20 và batch=2) Segment_Object
-        self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/segment/train/weights/best.pt")
+        # train (epoch=20 và batch=2) Segment_Object
+        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/segment/train/weights/best.pt")
+        # train2 (epoch=20 và batch=2) Segment_Object (last.pt model train)
+        self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/segment/train2/weights/best.pt")
 
         print("Loading Yolo Segmentation Model")
 
