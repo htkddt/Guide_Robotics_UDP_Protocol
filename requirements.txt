@@ -55,3 +55,4 @@ PyQt6~=6.6.0
 easyocr~=1.7.1
 serial~=0.0.97
 pyserial~=3.5
+pymodbus~=3.6.8
