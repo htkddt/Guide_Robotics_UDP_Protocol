@@ -14,24 +14,14 @@ from ultralytics import YOLO
 class YoloDetection:
     def __init__(self):
         # Load model
-        # train là yolov5nu (epoch=10 và batch=2) Data_1
+        # train (epoch=20 và batch=2) Object_Detection_1
         # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train/weights/best.pt")
-        # train2 là yolov8n (epoch=10 và batch=2) Data_1
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train2/weights/best.pt")
-        # train3 là yolov5nu (epoch=10 và batch=2) Data_2
+        # train2 (epoch=20 và batch=2) Object_Detection_1 (last.pt model train)
+        self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train2/weights/best.pt")
+        # train3 (epoch=20 và batch=2) Object_Detection_2 (last.pt model train)
         # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train3/weights/best.pt")
-        # train4 là yolov8n (epoch=10 và batch=2) Data_2
+        # train4 (epoch=20 và batch=2) Object_Detection_2 (best.pt model train)
         # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train4/weights/best.pt")
-        # train5 là yolov5nu (epoch=20 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train5/weights/best.pt")
-        # train6 là yolov8n (epoch=20 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train6/weights/best.pt")
-        # train7 là yolov8n (epoch=30 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train7/weights/best.pt")
-        # train8 là yolov8n (epoch=40 và batch=2) Data_2
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train8/weights/best.pt")
-        # train9 là yolov8n (epoch=20 và batch=2) Data_1
-        self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train9/weights/best.pt")
 
         # Load class
         self.license_class = [0, 1, 2, 3, 4]
@@ -54,6 +44,7 @@ class YoloDetection:
         bottom_right = None
         last_id = None
         name_last_id = None
+        id_list = []
 
         if frame is not None:
             self.frame_nr += 1
@@ -132,6 +123,7 @@ class YoloDetection:
 
                     last_id = int(class_id)
                     name_last_id = license_results.names[int(class_id)].upper()
+                    id_list.append(int(class_id))
 
                 # top_left = (int(x1), int(y1))
                 # bottom_right = (int(x2), int(y2))
@@ -187,5 +179,6 @@ class YoloDetection:
                 #
                 # last_id = int(class_id)
                 # name_last_id = license_results.names[int(class_id)].upper()
+                # id_list.append(int(class_id))
 
-        return frame, last_id, name_last_id, point_center, top_left, bottom_right
+        return frame, last_id, name_last_id, point_center, top_left, bottom_right, id_list
