@@ -1753,7 +1753,7 @@
     <property name="geometry">
      <rect>
       <x>1270</x>
-      <y>670</y>
+      <y>770</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -1772,7 +1772,7 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>520</y>
+      <y>620</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1785,7 +1785,7 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>570</y>
+      <y>670</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1798,7 +1798,7 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>620</y>
+      <y>720</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1932,6 +1932,44 @@
       <string>115200</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="btn_Pos_pick">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>480</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>POSITION</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_Move_test">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>530</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>MOVE</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
