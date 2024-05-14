@@ -18,6 +18,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
 
 from scipy.spatial.transform import Rotation
+from pymodbus.client import ModbusTcpClient
 from RealsenseCamera import *
 from YoloDetection import *
 from YoloSegmentation import *
@@ -65,6 +66,9 @@ class MainWindow(QMainWindow):
         self.Pitch_ = None
         self.Yaw_ = None
 
+        self.Mode_Control = self.uic.cBox_Mode.currentText()
+        print("Mode control: " + self.Mode_Control)
+
         self.flag_Capture_ArUco = None
         self.flag_Capture_Object = None
         self.flag_Capture_Background = None
@@ -94,7 +98,6 @@ class MainWindow(QMainWindow):
         self.conveyor = ConveyorSocket()
 
         self.serial = SerialProcess()
-        self.serial.start()
         self.serial.message.connect(self.update_serial)
         self.method = 0
 
@@ -109,7 +112,9 @@ class MainWindow(QMainWindow):
         self.uic.slider_Spe_mm.valueChanged.connect(self.update_txt1_Spe)
         self.uic.slider_Spe_deg.valueChanged.connect(self.update_txt2_Spe)
 
+        self.uic.cBox_Mode.currentIndexChanged.connect(self.update_mode)
         self.uic.btn_Connect_Disconnect.clicked.connect(self.con_dis_action)
+        self.uic.btn_Serial_ConDis.clicked.connect(self.con_dis_serial_action)
         self.uic.btn_Open_Close.clicked.connect(self.open_close_action)
 
         self.uic.btn_Servo.clicked.connect(self.servo_action)
@@ -146,6 +151,8 @@ class MainWindow(QMainWindow):
 
         self.uic.btn_Move_Job.clicked.connect(self.move_job_action)
         self.uic.btn_Exit_Job.clicked.connect(self.exit_job_action)
+        self.uic.btn_Pos_pick.clicked.connect(self.pos_pick_action)
+        self.uic.btn_Move_test.clicked.connect(self.move_test_action)
 
         self.uic.btn_Capture_Aruco.clicked.connect(self.capture_aruco_action)
         self.uic.btn_Capture_Object.clicked.connect(self.capture_object_action)
@@ -185,6 +192,20 @@ class MainWindow(QMainWindow):
             self.socket.disconnect()
             self.conveyor.disconnect()
             self.uic.lb_Connect_Disconnect.setText("Disconnected")
+
+    def con_dis_serial_action(self):
+        if self.uic.btn_Serial_ConDis.text() == "Connect":
+            self.uic.btn_Serial_ConDis.setText("Disconnect")
+            Port = self.uic.txt_Port_.text()
+            Baud = int(self.uic.txt_Baudrate.text())
+            self.serial.serial_connect(Port)
+            self.serial.start()
+            self.uic.lb_Connect_Disconnect_.setText("Connected")
+
+        elif self.uic.btn_Serial_ConDis.text() == "Disconnect":
+            self.uic.btn_Serial_ConDis.setText("Connect")
+            self.serial.serial_disconnect()
+            self.uic.lb_Connect_Disconnect_.setText("Disconnected")
 
     def open_close_action(self):
         self.camera.flag_Detect_YOLO = False
@@ -326,7 +347,7 @@ class MainWindow(QMainWindow):
 
         if Speed_type == 0:
             Speed_type = 1
-            Speed_value = 2500
+            Speed_value = 2000
         elif Speed_type == 1:
             Speed_value = self.uic.slider_Spe_mm.value()
         elif Speed_type == 2:
@@ -744,7 +765,11 @@ class MainWindow(QMainWindow):
             self.uic.btn_Move_Job.setText("RUN JOB")
 
         elif self.uic.btn_Move_Job.text() == "RUN JOB":
-            self.uic.btn_Move_Job.setText("RUNNING")
+            if self.Mode_Control == "Manual":
+                self.flag_Process = True
+                self.uic.btn_Move_Job.setText("RUNNING")
+            elif self.Mode_Control == "Auto":
+                self.uic.btn_Move_Job.setText("RUNNING")
 
         elif self.uic.btn_Move_Job.text() == "RUNNING":
             self.set_position_action(int(self.X_), int(self.Y_), 27000,
@@ -755,6 +780,8 @@ class MainWindow(QMainWindow):
                                      3)
             self.set_byte_action(1, 2)
             self.set_byte_action(0, 5)
+            if self.Mode_Control == "Manual":
+                self.uic.btn_Move_Job.setText("RUN JOB")
 
     def exit_job_action(self):
         if self.uic.btn_Move_Job.text() == "RUNNING":
@@ -902,40 +929,41 @@ class MainWindow(QMainWindow):
 
     def conveyor_action(self):
         if self.uic.btn_Conveyor.text() == "Conveyor ON":
-            frame = bytes([0x11,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00, 0x00,
-                           0x00, 0x00, 0x00, 0x00,
-                           0x00, 0x08,
-                           0x20,
-                           0x00,
-                           0x00,
-                           0x00, 0x00,
-                           0x00, 0x01])
-            self.conveyor.send_function(frame)
-            self.conveyor.received_function()
+            self.conveyor.send_function(bytes([0x01]))
+            # frame = bytes([0x11,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00, 0x00,
+            #                0x00, 0x00, 0x00, 0x00,
+            #                0x00, 0x08,
+            #                0x20,
+            #                0x00,
+            #                0x00,
+            #                0x00, 0x00,
+            #                0x00, 0x01])
+            # self.conveyor.send_function(frame)
+            # self.conveyor.received_function()
             self.uic.btn_Conveyor.setText("Conveyor OFF")
         elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
-            frame = bytes([0x11,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00,
-                           0x00, 0x00,
-                           0x00, 0x00, 0x00, 0x00,
-                           0x00, 0x08,
-                           0x20,
-                           0x00,
-                           0x00,
-                           0x00, 0x00,
-                           0x00, 0x00])
-            self.conveyor.send_function(frame)
-            self.conveyor.received_function()
+            # frame = bytes([0x11,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00,
+            #                0x00, 0x00,
+            #                0x00, 0x00, 0x00, 0x00,
+            #                0x00, 0x08,
+            #                0x20,
+            #                0x00,
+            #                0x00,
+            #                0x00, 0x00,
+            #                0x00, 0x00])
+            # self.conveyor.send_function(frame)
+            # self.conveyor.received_function()
             self.uic.btn_Conveyor.setText("Conveyor ON")
 
     def serial_process_action(self, Pulse):
@@ -964,6 +992,29 @@ class MainWindow(QMainWindow):
     def stop_time(self):
         self.end_time = time.time()
         self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
+
+    def pos_pick_action(self):
+        self.flag_Enable_Job = True
+        print("X = " + str(self.X_))
+        print("Y = " + str(self.Y_))
+        print("Z = " + str(self.Z_))
+        print("Roll = " + str(self.Roll_))
+        print("Pitch = " + str(self.Pitch_))
+        print("Yaw = " + str(self.Yaw_))
+
+    def move_test_action(self):
+        X_ = self.X_
+        Y_ = self.Y_
+        Z_ = self.Z_
+        Roll_ = self.Roll_
+        Pitch_ = self.Pitch_
+        Yaw_ = self.Yaw_
+
+        self.move_command_action(0, int(X_), int(Y_), 35000,
+                                 int(Roll_), int(Pitch_), int(Yaw_))
+        time.sleep(3)
+        self.move_command_action(0, int(X_), int(Y_), int(Z_),
+                                 int(Roll_), int(Pitch_), int(Yaw_))
 
     def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
         print("Status detect: " + str(flag_last_id))
@@ -1113,9 +1164,9 @@ class MainWindow(QMainWindow):
                                        [1.0]])
                         Wr = self.T_cam2base.dot(Wc)
 
-                        self.X_ = Wr[0][0] * 1000
-                        self.Y_ = Wr[1][0] * 1000
-                        self.Z_ = Wr[2][0] * 1000
+                        self.X_ = Wr[0][0] * 1000 + 10000
+                        self.Y_ = Wr[1][0] * 1000 + 75000
+                        self.Z_ = Wr[2][0] * 1000 - 7000
                         self.Roll_ = 180 * 10000
                         self.Pitch_ = 0 * 10000
                         self.Yaw_ = int(angle * 10000)
@@ -1165,7 +1216,10 @@ class MainWindow(QMainWindow):
                     self.flag_Process = False
                     self.uic.lb_Gripper.setText("Gripper: None")
                 elif status == 1:
-                    self.flag_Process = True
+                    if self.Mode_Control == "Auto":
+                        self.flag_Process = True
+                    else:
+                        self.flag_Process = False
                 elif status == 2:
                     self.uic.lb_Gripper.setText("Gripper: Pick")
                     self.method = 4
@@ -1176,10 +1230,13 @@ class MainWindow(QMainWindow):
                     self.method = 5
                     self.serial_process_action(80)
                     self.timer.stop()
+            else:
+                self.method = 0
+                self.serial_process_action(80)
             self.flag_Select = True
 
     def update_serial(self, Data_received):
-        self.uic.txt_Received.setText(str(Data_received))
+        # self.uic.txt_Received.setText(str(Data_received))
         Service = Data_received[9]
         if Service == b'\x04':
             self.set_byte_action(1, 3)
@@ -1190,6 +1247,10 @@ class MainWindow(QMainWindow):
             self.flag_Select = True
             self.timer.start(100)
         self.method = 0
+
+    def update_mode(self):
+        self.Mode_Control = self.uic.cBox_Mode.currentText()
+        print("Mode control: " + self.Mode_Control)
 
 
 class RobotSocket(QThread):
@@ -1279,13 +1340,14 @@ class ConveyorSocket(QThread):
         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.client = ModbusTcpClient(self.IP, port=self.Port)
         print("Conveyor Socket Finished Init")
 
     def run(self):
         # Thiết lập kết nối
         try:
             self.s.connect((self.IP, self.Port))
-            print("\nStatus Conveyor Connected")
+            # self.client.connect()
             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
         except Exception as e:
             print("Error:", e)
@@ -1295,10 +1357,17 @@ class ConveyorSocket(QThread):
             self.s.close()
             print("Status Conveyor Disconnected")
             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # print("Status Conveyor Disconnected")
 
-    def send_function(self, frame_data):
-        self.s.sendto(frame_data, (self.IP, self.Port))
-        print("Data Send: " + str(frame_data))
+    def send_function(self, data):
+        self.s.sendto(data, (self.IP, self.Port))
+        print("Data Send: " + str(data))
+        # response = self.client.write_register(0, 1, (self.IP, self.Port))
+        # print(str(response))
+        # if response.isError():
+        #     print("Error:", response)
+        # else:
+        #     print("Successfully")
 
     def received_function(self):
         frame_data, _ = self.s.recvfrom(4096)
@@ -1474,30 +1543,43 @@ class SerialProcess(QThread):
     def __init__(self):
         super(SerialProcess, self).__init__()
         self.serialPort = serial.Serial()
-        self.serialPort.port = 'COM4'
-        self.serialPort.open()
         self.Data_received = []
         self.flag_DataAvailable = False
+        self.flag_Connected = None
         self.STX = bytes([0x02])
         self.ETX = bytes([0x03])
+        print("Serial Port Finished Init")
+
+    def serial_connect(self, Port):
+        self.serialPort.port = Port
+        self.serialPort.open()
+        self.flag_Connected = True
         print("Serial Port is Open")
+
+    def serial_disconnect(self):
+        self.flag_Connected = False
+        self.serialPort.close()
+        print("Serial Port is Close")
 
     def run(self):
         while True:
-            Data = self.serialPort.read()
-            if Data == self.STX:
-                self.flag_DataAvailable = True
-            elif Data == self.ETX:
-                self.Data_received.append(Data)
-                self.flag_DataAvailable = False
-            if self.flag_DataAvailable:
-                self.Data_received.append(Data)
+            if self.flag_Connected:
+                Data = self.serialPort.read()
+                if Data == self.STX:
+                    self.flag_DataAvailable = True
+                elif Data == self.ETX:
+                    self.Data_received.append(Data)
+                    self.flag_DataAvailable = False
+                if self.flag_DataAvailable:
+                    self.Data_received.append(Data)
+                else:
+                    print("Data received = " + str(self.Data_received) + '\n' +
+                          "Data [9] = " + str(self.Data_received[9]) + '\n' +
+                          "Data [12] = " + str(self.Data_received[12]))
+                    self.message.emit(self.Data_received)
+                    self.Data_received.clear()
             else:
-                print("Data received = " + str(self.Data_received) + '\n' +
-                      "Data [9] = " + str(self.Data_received[9]) + '\n' +
-                      "Data [12] = " + str(self.Data_received[12]))
-                self.message.emit(self.Data_received)
-                self.Data_received.clear()
+                break
 
     def sendSerial(self, Data):
         print(str(Data))
