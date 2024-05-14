@@ -1,8 +1,9 @@
-path: D:/A_Project/PyCharm_Project/Segmentation_Object
+path: D:/A_Project/PyCharm_Project/Object_Detection_2
 train: images/train
 val: images/val
 
 names:
+#  0: Contour
   0: Duck
   1: Frog
   2: Fish
