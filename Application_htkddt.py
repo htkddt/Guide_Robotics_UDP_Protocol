@@ -46,8 +46,8 @@ class MainWindow(QMainWindow):
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self)
 
-        self.index_data = 315
-        self.index_folder = 2
+        self.index_data = 0
+        self.index_folder = 4
 
         self.uic.lb_Gripper.setText("Gripper: None")
         self.uic.txt_dt.setText("0")
