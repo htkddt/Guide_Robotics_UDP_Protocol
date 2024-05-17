@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
 
         self.uic.btn_Get_Position.clicked.connect(self.get_position_action)
 
-        self.uic.btn_Conveyor.clicked.connect(self.conveyor_action)
+        # self.uic.btn_Conveyor.clicked.connect(self.conveyor_action)
 
         self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
 
@@ -927,44 +927,44 @@ class MainWindow(QMainWindow):
 
             status += 1
 
-    def conveyor_action(self):
-        if self.uic.btn_Conveyor.text() == "Conveyor ON":
-            self.conveyor.send_function(bytes([0x01]))
-            # frame = bytes([0x11,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00, 0x00,
-            #                0x00, 0x00, 0x00, 0x00,
-            #                0x00, 0x08,
-            #                0x20,
-            #                0x00,
-            #                0x00,
-            #                0x00, 0x00,
-            #                0x00, 0x01])
-            # self.conveyor.send_function(frame)
-            # self.conveyor.received_function()
-            self.uic.btn_Conveyor.setText("Conveyor OFF")
-        elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
-            # frame = bytes([0x11,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00,
-            #                0x00, 0x00,
-            #                0x00, 0x00, 0x00, 0x00,
-            #                0x00, 0x08,
-            #                0x20,
-            #                0x00,
-            #                0x00,
-            #                0x00, 0x00,
-            #                0x00, 0x00])
-            # self.conveyor.send_function(frame)
-            # self.conveyor.received_function()
-            self.uic.btn_Conveyor.setText("Conveyor ON")
+    # def conveyor_action(self):
+    #     if self.uic.btn_Conveyor.text() == "Conveyor ON":
+    #         self.conveyor.send_function(bytes([0x01]))
+    #         # frame = bytes([0x11,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00, 0x00, 0x00,
+    #         #                0x00, 0x08,
+    #         #                0x20,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x01])
+    #         # self.conveyor.send_function(frame)
+    #         # self.conveyor.received_function()
+    #         self.uic.btn_Conveyor.setText("Conveyor OFF")
+    #     elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
+    #         # frame = bytes([0x11,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00, 0x00, 0x00,
+    #         #                0x00, 0x08,
+    #         #                0x20,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00])
+    #         # self.conveyor.send_function(frame)
+    #         # self.conveyor.received_function()
+    #         self.uic.btn_Conveyor.setText("Conveyor ON")
 
     def serial_process_action(self, Pulse):
         Data = []
@@ -1331,47 +1331,47 @@ class RobotSocket(QThread):
         return frame_data
 
 
-class ConveyorSocket(QThread):
-    def __init__(self):
-        super(ConveyorSocket, self).__init__()
-        self.IP = '192.168.1.1'
-        self.Port = 10001
-
-        # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
-        # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # self.client = ModbusTcpClient(self.IP, port=self.Port)
-        print("Conveyor Socket Finished Init")
-
-    def run(self):
-        # Thiết lập kết nối
-        try:
-            self.s.connect((self.IP, self.Port))
-            # self.client.connect()
-            print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
-        except Exception as e:
-            print("Error:", e)
-
-    def disconnect(self):
-        if self.s:
-            self.s.close()
-            print("Status Conveyor Disconnected")
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # print("Status Conveyor Disconnected")
-
-    def send_function(self, data):
-        self.s.sendto(data, (self.IP, self.Port))
-        print("Data Send: " + str(data))
-        # response = self.client.write_register(0, 1, (self.IP, self.Port))
-        # print(str(response))
-        # if response.isError():
-        #     print("Error:", response)
-        # else:
-        #     print("Successfully")
-
-    def received_function(self):
-        frame_data, _ = self.s.recvfrom(4096)
-        print("Data Received: " + str(frame_data) + '\n')
+# class ConveyorSocket(QThread):
+#     def __init__(self):
+#         super(ConveyorSocket, self).__init__()
+#         self.IP = '192.168.1.1'
+#         self.Port = 10001
+#
+#         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
+#         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
+#         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         # self.client = ModbusTcpClient(self.IP, port=self.Port)
+#         print("Conveyor Socket Finished Init")
+#
+#     def run(self):
+#         # Thiết lập kết nối
+#         try:
+#             self.s.connect((self.IP, self.Port))
+#             # self.client.connect()
+#             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
+#         except Exception as e:
+#             print("Error:", e)
+#
+#     def disconnect(self):
+#         if self.s:
+#             self.s.close()
+#             print("Status Conveyor Disconnected")
+#             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         # print("Status Conveyor Disconnected")
+#
+#     def send_function(self, data):
+#         self.s.sendto(data, (self.IP, self.Port))
+#         print("Data Send: " + str(data))
+#         # response = self.client.write_register(0, 1, (self.IP, self.Port))
+#         # print(str(response))
+#         # if response.isError():
+#         #     print("Error:", response)
+#         # else:
+#         #     print("Successfully")
+#
+#     def received_function(self):
+#         frame_data, _ = self.s.recvfrom(4096)
+#         print("Data Received: " + str(frame_data) + '\n')
 
 
 class CameraThread(QThread):
