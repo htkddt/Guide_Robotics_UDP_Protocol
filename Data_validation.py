@@ -1,9 +1,7 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import sys
 import os
 import random
 import shutil
-# Test source //
 
 # Đường dẫn đến thư mục chứa ảnh ban đầu
 source_folder = 'D:\\A_Project\\PyCharm_Project\\Object_Detection_2\\images\\train'

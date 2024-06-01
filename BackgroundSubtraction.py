@@ -1,4 +1,3 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import math
 import sys
 import cv2
@@ -7,7 +6,6 @@ import numpy as np
 from imutils import perspective
 from imutils import contours
 from RealsenseCamera import *
-# Test source
 
 rs = RealsenseCamera()
 

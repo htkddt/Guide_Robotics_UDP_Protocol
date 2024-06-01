@@ -1,9 +1,7 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import sys
 import os
 import cv2
 import numpy as np
-# Test source
 
 Int_matrix = np.array([[608.32574463, 0, 330.66174316],
                        [0, 606.69873047, 242.11862183],

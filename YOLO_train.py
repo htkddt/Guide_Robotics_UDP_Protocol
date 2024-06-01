@@ -1,4 +1,3 @@
-# Huỳnh Tuấn Kiệt - 2010364
 from ultralytics import YOLO
 
 # Load model

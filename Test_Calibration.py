@@ -1,8 +1,6 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import sys
 import os
 import numpy as np
-# Test source
 
 Position_folder_path = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Test'
 Position_files = [f for f in os.listdir(Position_folder_path) if f.endswith('.txt')]

@@ -1,8 +1,6 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import sys
 import os
 import cv2
-# Test source // Test source
 
 tl_point = (150, 275)
 br_point = (470, 420)

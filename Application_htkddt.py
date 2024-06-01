@@ -1,4 +1,3 @@
-# Huỳnh Tuấn Kiệt - 2010364
 import math
 import os
 import sys
@@ -32,7 +31,7 @@ class MainWindow():
         self.main_win = QMainWindow()
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self.main_win)
-        
+
     def show(self):
         self.main_win.show()
 """
@@ -96,7 +95,7 @@ class MainWindow(QMainWindow):
         self.detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
 
         self.socket = RobotSocket()
-        self.conveyor = ConveyorSocket()
+        # self.conveyor = ConveyorSocket()
 
         self.serial = SerialProcess()
         self.serial.message.connect(self.update_serial)
@@ -185,13 +184,13 @@ class MainWindow(QMainWindow):
             self.socket.robot_address(IP, Port)
             self.socket.status = 0
             self.socket.start()
-            self.conveyor.start()
+            # self.conveyor.start()
             self.uic.lb_Connect_Disconnect.setText("Connected")
 
         elif self.uic.btn_Connect_Disconnect.text() == "Disconnect":
             self.uic.btn_Connect_Disconnect.setText("Connect")
             self.socket.disconnect()
-            self.conveyor.disconnect()
+            # self.conveyor.disconnect()
             self.uic.lb_Connect_Disconnect.setText("Disconnected")
 
     def con_dis_serial_action(self):
@@ -928,45 +927,6 @@ class MainWindow(QMainWindow):
 
             status += 1
 
-    # def conveyor_action(self):
-    #     if self.uic.btn_Conveyor.text() == "Conveyor ON":
-    #         self.conveyor.send_function(bytes([0x01]))
-    #         # frame = bytes([0x11,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00, 0x00, 0x00,
-    #         #                0x00, 0x08,
-    #         #                0x20,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x01])
-    #         # self.conveyor.send_function(frame)
-    #         # self.conveyor.received_function()
-    #         self.uic.btn_Conveyor.setText("Conveyor OFF")
-    #     elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
-    #         # frame = bytes([0x11,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00, 0x00, 0x00,
-    #         #                0x00, 0x08,
-    #         #                0x20,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00])
-    #         # self.conveyor.send_function(frame)
-    #         # self.conveyor.received_function()
-    #         self.uic.btn_Conveyor.setText("Conveyor ON")
-
     def serial_process_action(self, Pulse):
         Data = []
         STX = bytes([0x02])
@@ -1148,6 +1108,13 @@ class MainWindow(QMainWindow):
                         self.Pitch_ = 0 * 10000
                         self.Yaw_ = 0 * 10000
 
+                        print("X = " + str(self.X_))
+                        print("Y = " + str(self.Y_))
+                        print("Z = " + str(self.Z_))
+                        print("Roll = " + str(self.Roll_))
+                        print("Pitch = " + str(self.Pitch_))
+                        print("Yaw = " + str(self.Yaw_))
+
                         self.flag_Data_Position = False
 
                         if self.flag_Process:
@@ -1165,9 +1132,10 @@ class MainWindow(QMainWindow):
                                        [1.0]])
                         Wr = self.T_cam2base.dot(Wc)
 
-                        self.X_ = Wr[0][0] * 1000 + 10000
-                        self.Y_ = Wr[1][0] * 1000 + 75000
-                        self.Z_ = Wr[2][0] * 1000 - 7000
+                        # if Wr[0][0] > 200 & Wr[0][0] < 280 * Wr[1][0] > (-190) & Wr[1][0] < 10:
+                        self.X_ = Wr[0][0] * 1000 + 15000
+                        self.Y_ = Wr[1][0] * 1000 + 73000
+                        self.Z_ = Wr[2][0] * 1000 - 5000
                         self.Roll_ = 180 * 10000
                         self.Pitch_ = 0 * 10000
                         self.Yaw_ = int(angle * 10000)
@@ -1213,6 +1181,7 @@ class MainWindow(QMainWindow):
         elif not self.flag_Select:
             if self.flag_Enable_Job:
                 status = self.get_byte_action(5)
+                self.uic.txt_Status.setText("Byte 5 = " + str(status))
                 if status == 0:
                     self.flag_Process = False
                     self.uic.lb_Gripper.setText("Gripper: None")
@@ -1225,11 +1194,13 @@ class MainWindow(QMainWindow):
                     self.uic.lb_Gripper.setText("Gripper: Pick")
                     self.method = 4
                     self.serial_process_action(30)
+                    self.set_byte_action(0, 5)
                     self.timer.stop()
                 elif status == 3:
                     self.uic.lb_Gripper.setText("Gripper: Place")
                     self.method = 5
                     self.serial_process_action(80)
+                    self.set_byte_action(0, 5)
                     self.timer.stop()
             else:
                 self.method = 0
@@ -1242,16 +1213,55 @@ class MainWindow(QMainWindow):
         if Service == b'\x04':
             self.set_byte_action(1, 3)
             self.flag_Select = True
-            self.timer.start(100)
+            self.timer.start(50)
         elif Service == b'\x05':
             self.set_byte_action(1, 1)
             self.flag_Select = True
-            self.timer.start(100)
+            self.timer.start(50)
         self.method = 0
 
     def update_mode(self):
         self.Mode_Control = self.uic.cBox_Mode.currentText()
         print("Mode control: " + self.Mode_Control)
+
+    # def conveyor_action(self):
+    #     if self.uic.btn_Conveyor.text() == "Conveyor ON":
+    #         self.conveyor.send_function(bytes([0x01]))
+    #         # frame = bytes([0x11,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00, 0x00, 0x00,
+    #         #                0x00, 0x08,
+    #         #                0x20,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x01])
+    #         # self.conveyor.send_function(frame)
+    #         # self.conveyor.received_function()
+    #         self.uic.btn_Conveyor.setText("Conveyor OFF")
+    #     elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
+    #         # frame = bytes([0x11,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00, 0x00, 0x00,
+    #         #                0x00, 0x08,
+    #         #                0x20,
+    #         #                0x00,
+    #         #                0x00,
+    #         #                0x00, 0x00,
+    #         #                0x00, 0x00])
+    #         # self.conveyor.send_function(frame)
+    #         # self.conveyor.received_function()
+    #         self.uic.btn_Conveyor.setText("Conveyor ON")
 
 
 class RobotSocket(QThread):
@@ -1332,49 +1342,6 @@ class RobotSocket(QThread):
         return frame_data
 
 
-# class ConveyorSocket(QThread):
-#     def __init__(self):
-#         super(ConveyorSocket, self).__init__()
-#         self.IP = '192.168.1.1'
-#         self.Port = 10001
-#
-#         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
-#         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
-#         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         # self.client = ModbusTcpClient(self.IP, port=self.Port)
-#         print("Conveyor Socket Finished Init")
-#
-#     def run(self):
-#         # Thiết lập kết nối
-#         try:
-#             self.s.connect((self.IP, self.Port))
-#             # self.client.connect()
-#             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
-#         except Exception as e:
-#             print("Error:", e)
-#
-#     def disconnect(self):
-#         if self.s:
-#             self.s.close()
-#             print("Status Conveyor Disconnected")
-#             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         # print("Status Conveyor Disconnected")
-#
-#     def send_function(self, data):
-#         self.s.sendto(data, (self.IP, self.Port))
-#         print("Data Send: " + str(data))
-#         # response = self.client.write_register(0, 1, (self.IP, self.Port))
-#         # print(str(response))
-#         # if response.isError():
-#         #     print("Error:", response)
-#         # else:
-#         #     print("Successfully")
-#
-#     def received_function(self):
-#         frame_data, _ = self.s.recvfrom(4096)
-#         print("Data Received: " + str(frame_data) + '\n')
-
-
 class CameraThread(QThread):
     image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
 
@@ -1424,7 +1391,8 @@ class CameraThread(QThread):
                     obj = True
 
                 if self.flag_Detect_YOLO:
-                    color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(color_frame)
+                    color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(
+                        color_frame)
 
                     if last_id is None:
                         flag_last_id = False
@@ -1559,7 +1527,6 @@ class SerialProcess(QThread):
 
     def serial_disconnect(self):
         self.flag_Connected = False
-        self.serialPort.close()
         print("Serial Port is Close")
 
     def run(self):
@@ -1574,17 +1541,61 @@ class SerialProcess(QThread):
                 if self.flag_DataAvailable:
                     self.Data_received.append(Data)
                 else:
-                    print("Data received = " + str(self.Data_received) + '\n' +
-                          "Data [9] = " + str(self.Data_received[9]) + '\n' +
-                          "Data [12] = " + str(self.Data_received[12]))
+                    # print("Data received = " + str(self.Data_received) + '\n' +
+                    #       "Data [9] = " + str(self.Data_received[9]) + '\n' +
+                    #       "Data [12] = " + str(self.Data_received[12]))
                     self.message.emit(self.Data_received)
                     self.Data_received.clear()
             else:
+                self.serialPort.close()
                 break
 
     def sendSerial(self, Data):
         print(str(Data))
         self.serialPort.write(Data)
+
+
+# class ConveyorSocket(QThread):
+#     def __init__(self):
+#         super(ConveyorSocket, self).__init__()
+#         self.IP = '192.168.1.1'
+#         self.Port = 10001
+#
+#         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
+#         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
+#         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         # self.client = ModbusTcpClient(self.IP, port=self.Port)
+#         print("Conveyor Socket Finished Init")
+#
+#     def run(self):
+#         # Thiết lập kết nối
+#         try:
+#             self.s.connect((self.IP, self.Port))
+#             # self.client.connect()
+#             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
+#         except Exception as e:
+#             print("Error:", e)
+#
+#     def disconnect(self):
+#         if self.s:
+#             self.s.close()
+#             print("Status Conveyor Disconnected")
+#             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         # print("Status Conveyor Disconnected")
+#
+#     def send_function(self, data):
+#         self.s.sendto(data, (self.IP, self.Port))
+#         print("Data Send: " + str(data))
+#         # response = self.client.write_register(0, 1, (self.IP, self.Port))
+#         # print(str(response))
+#         # if response.isError():
+#         #     print("Error:", response)
+#         # else:
+#         #     print("Successfully")
+#
+#     def received_function(self):
+#         frame_data, _ = self.s.recvfrom(4096)
+#         print("Data Received: " + str(frame_data) + '\n')
 
 
 if __name__ == "__main__":

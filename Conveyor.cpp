@@ -1,4 +1,3 @@
-// Huỳnh Tuấn Kiệt - 2010364
 #include <stdio.h>
 #include <winsock.h>
 #include <winioctl.h>
