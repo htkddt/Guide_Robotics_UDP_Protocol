@@ -564,7 +564,7 @@
       <string>Get Position</string>
      </property>
     </widget>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="gr_Pulse">
      <property name="geometry">
       <rect>
        <x>50</x>
@@ -664,7 +664,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="gr_Cartesian">
      <property name="geometry">
       <rect>
        <x>290</x>
