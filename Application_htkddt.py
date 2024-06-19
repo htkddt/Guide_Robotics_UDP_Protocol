@@ -66,8 +66,11 @@ class MainWindow(QMainWindow):
         self.Pitch_ = None
         self.Yaw_ = None
 
-        self.Mode_Control = self.uic.cBox_Mode.currentText()
-        print("Mode control: " + self.Mode_Control)
+        # self.Mode_Control = self.uic.cBox_Mode.currentText()
+        # print("Mode control: " + self.Mode_Control)
+
+        self.flag_Auto = None
+        self.flag_Manual = None
 
         self.flag_Capture_ArUco = None
         self.flag_Capture_Object = None
@@ -112,8 +115,10 @@ class MainWindow(QMainWindow):
         self.uic.slider_Spe_mm.valueChanged.connect(self.update_txt1_Spe)
         self.uic.slider_Spe_deg.valueChanged.connect(self.update_txt2_Spe)
 
-        self.uic.cBox_Mode.currentIndexChanged.connect(self.update_mode)
-        self.uic.btn_Connect_Disconnect.clicked.connect(self.con_dis_action)
+        # self.uic.cBox_Mode.currentIndexChanged.connect(self.update_mode)
+        self.uic.btn_Auto.clicked.connect(self.mode_auto)
+        self.uic.btn_Manual.clicked.connect(self.mode_manual)
+        self.uic.btn_Robot_ConDis.clicked.connect(self.con_dis_robot_action)
         self.uic.btn_Serial_ConDis.clicked.connect(self.con_dis_serial_action)
         self.uic.btn_Open_Close.clicked.connect(self.open_close_action)
 
@@ -173,7 +178,7 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
-    def con_dis_action(self):
+    def con_dis_robot_action(self):
         if self.uic.btn_Connect_Disconnect.text() == "Connect":
             self.uic.btn_Connect_Disconnect.setText("Disconnect")
 
@@ -206,6 +211,14 @@ class MainWindow(QMainWindow):
             self.uic.btn_Serial_ConDis.setText("Connect")
             self.serial.serial_disconnect()
             self.uic.lb_Connect_Disconnect_.setText("Disconnected")
+
+    def mode_auto(self):
+        self.flag_Auto = True
+        self.flag_Manual = False
+
+    def mode_manual(self):
+        self.flag_Auto = False
+        self.flag_Manual = True
 
     def open_close_action(self):
         self.camera.flag_Detect_YOLO = False
@@ -765,10 +778,10 @@ class MainWindow(QMainWindow):
             self.uic.btn_Move_Job.setText("RUN JOB")
 
         elif self.uic.btn_Move_Job.text() == "RUN JOB":
-            if self.Mode_Control == "Manual":
+            if self.flag_Manual:
                 self.flag_Process = True
                 self.uic.btn_Move_Job.setText("RUNNING")
-            elif self.Mode_Control == "Auto":
+            elif self.flag_Auto:
                 self.uic.btn_Move_Job.setText("RUNNING")
 
         elif self.uic.btn_Move_Job.text() == "RUNNING":
@@ -780,7 +793,7 @@ class MainWindow(QMainWindow):
                                      3)
             self.set_byte_action(1, 2)
             self.set_byte_action(0, 5)
-            if self.Mode_Control == "Manual":
+            if self.flag_Manual:
                 self.uic.btn_Move_Job.setText("RUN JOB")
 
     def exit_job_action(self):
@@ -1186,7 +1199,7 @@ class MainWindow(QMainWindow):
                     self.flag_Process = False
                     self.uic.lb_Gripper.setText("Gripper: None")
                 elif status == 1:
-                    if self.Mode_Control == "Auto":
+                    if self.flag_Auto:
                         self.flag_Process = True
                     else:
                         self.flag_Process = False
@@ -1220,9 +1233,9 @@ class MainWindow(QMainWindow):
             self.timer.start(50)
         self.method = 0
 
-    def update_mode(self):
-        self.Mode_Control = self.uic.cBox_Mode.currentText()
-        print("Mode control: " + self.Mode_Control)
+    # def update_mode(self):
+    #     self.Mode_Control = self.uic.cBox_Mode.currentText()
+    #     print("Mode control: " + self.Mode_Control)
 
     # def conveyor_action(self):
     #     if self.uic.btn_Conveyor.text() == "Conveyor ON":

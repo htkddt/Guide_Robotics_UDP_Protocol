@@ -108,7 +108,7 @@
        <string>IP address</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_Connect_Disconnect">
+     <widget class="QPushButton" name="btn_Robot_ConDis">
       <property name="geometry">
        <rect>
         <x>10</x>
