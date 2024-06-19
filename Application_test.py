@@ -39,6 +39,51 @@ class MainWindow(QMainWindow):
         self.uic.btn_Detect.clicked.connect(self.detect_action)
         self.uic.btn_Close.clicked.connect(self.close_action)
 
+        self.set_button_style()
+
+    def set_button_style(self):
+        self.uic.btn_Open.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
+        self.uic.btn_Detect.setStyleSheet("""
+            QPushButton {
+                background-color: #2980b9;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #3498db;
+            }
+            QPushButton:pressed {
+                background-color: #34495e;
+            }
+        """)
+
+        self.uic.btn_Close.setStyleSheet("""
+            QPushButton {
+                background-color: #c0392b;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #e74c3c;
+            }
+            QPushButton:pressed {
+                background-color: #f1c40f;
+            }
+        """)
+
     def open_action(self):
         opt = QFileDialog.Options()
         opt |= QFileDialog.DontUseNativeDialog
@@ -51,6 +96,22 @@ class MainWindow(QMainWindow):
 
             pixmap = QImage(self.frame, self.frame.shape[1], self.frame.shape[0], QImage.Format_RGB888)
             self.uic.Image_frame_1.setPixmap(QPixmap.fromImage(pixmap))
+
+            self.uic.btn_Open.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                    color: black;
+                    font-size: 20px;
+                }
+            """)
+
+            self.uic.btn_Close.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                    color: black;
+                    font-size: 20px;
+                }
+            """)
 
     def detect_action(self):
         conv = cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR)
@@ -69,6 +130,20 @@ class MainWindow(QMainWindow):
 
         pixmap = QImage(self.binary, self.binary.shape[1], self.binary.shape[0], QImage.Format_Indexed8)
         self.uic.Image_frame_2.setPixmap(QPixmap.fromImage(pixmap))
+
+        self.uic.btn_Detect.setStyleSheet("""
+            QPushButton {
+                background-color: #2980b9;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #3498db;
+            }
+            QPushButton:pressed {
+                background-color: #34495e;
+            }
+        """)
 
     def drawAxis(self, img, p_, q_, colour, scale):
         p = list(p_)
@@ -125,6 +200,22 @@ class MainWindow(QMainWindow):
     def close_action(self):
         self.uic.Image_frame_1.clear()
         self.uic.Image_frame_2.clear()
+
+        self.uic.btn_Open.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+        """)
+
+        self.uic.btn_Close.setStyleSheet("""
+            QPushButton {
+                background-color: #c0392b;
+                color: black;
+                font-size: 20px;
+            }
+        """)
 
 
 if __name__ == "__main__":
