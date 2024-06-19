@@ -178,22 +178,22 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
-    # def set_button_style(self):
-    #     self.setStyleSheet("""
-    #         QPushButton {
-    #             background-color: #4CAF50;
-    #             color: white;
-    #             border: 2px solid #4CAF50;
-    #             border-radius: 10px;
-    #             font-size: 18px;
-    #         }
-    #         QPushButton:hover {
-    #             background-color: #45a049;
-    #         }
-    #         QPushButton:pressed {
-    #             background-color: #3e8e41;
-    #         }
-    #     """)
+    def set_button_style(self):
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border: 2px solid #4CAF50;
+                border-radius: 10px;
+                font-size: 18px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3e8e41;
+            }
+        """)
 
     def con_dis_robot_action(self):
         if self.uic.btn_Connect_Disconnect.text() == "Connect":
