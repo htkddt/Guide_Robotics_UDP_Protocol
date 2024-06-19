@@ -117,6 +117,13 @@
         <height>41</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="text">
        <string>Connect</string>
       </property>
@@ -241,6 +248,13 @@
         <width>231</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
       <property name="text">
        <string>Connect</string>
@@ -538,6 +552,13 @@
        <width>441</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Get Position</string>
@@ -1023,8 +1044,15 @@
       <x>30</x>
       <y>220</y>
       <width>561</width>
-      <height>131</height>
+      <height>151</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="title">
      <string>BASIC CONTROL</string>
@@ -1032,11 +1060,18 @@
     <widget class="QPushButton" name="btn_Home">
      <property name="geometry">
       <rect>
-       <x>390</x>
-       <y>70</y>
-       <width>151</width>
+       <x>190</x>
+       <y>90</y>
+       <width>141</width>
        <height>51</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Go Home</string>
@@ -1045,49 +1080,97 @@
     <widget class="QPushButton" name="btn_Servo">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>70</y>
+       <x>190</x>
+       <y>30</y>
        <width>141</width>
        <height>51</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Servo On</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_Serial">
+    <widget class="QPushButton" name="btn_Manual">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>70</y>
+       <y>90</y>
+       <width>141</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>MANUAL</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Auto">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>141</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>AUTO</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Serial">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>90</y>
        <width>171</width>
        <height>51</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <weight>50</weight>
-       <bold>false</bold>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>SEND DATA SERIAL</string>
+      <string>Send Data Serial</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_Pulse">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>30</y>
-       <width>101</width>
+       <x>430</x>
+       <y>40</y>
+       <width>91</width>
        <height>31</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>8</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
       </font>
      </property>
      <property name="alignment">
@@ -1097,15 +1180,15 @@
     <widget class="QLabel" name="lb_Value">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
+       <x>370</x>
+       <y>40</y>
        <width>51</width>
        <height>31</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>8</pointsize>
+       <pointsize>9</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -1119,33 +1202,6 @@
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
-    </widget>
-    <widget class="QComboBox" name="cBox_Mode">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>30</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <item>
-      <property name="text">
-       <string>Auto</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Manual</string>
-      </property>
-     </item>
     </widget>
    </widget>
    <widget class="QPushButton" name="btn_Open_Close">
@@ -1165,7 +1221,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>360</y>
+      <y>380</y>
       <width>561</width>
       <height>421</height>
      </rect>
@@ -1447,10 +1503,17 @@
      <property name="geometry">
       <rect>
        <x>330</x>
-       <y>60</y>
-       <width>71</width>
-       <height>20</height>
+       <y>49</y>
+       <width>111</width>
+       <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="lineWidth">
       <number>0</number>
@@ -1466,10 +1529,17 @@
      <property name="geometry">
       <rect>
        <x>330</x>
-       <y>260</y>
-       <width>51</width>
-       <height>20</height>
+       <y>249</y>
+       <width>91</width>
+       <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="lineWidth">
       <number>0</number>
@@ -1806,9 +1876,9 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>370</y>
+      <y>360</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -1832,7 +1902,7 @@
       <x>1290</x>
       <y>320</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -1854,9 +1924,9 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>420</y>
+      <y>400</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -1897,33 +1967,45 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>570</y>
+      <y>450</y>
       <width>111</width>
       <height>41</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>Start time</string>
+     <string>START TIME</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_Stop">
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>620</y>
+      <y>500</y>
       <width>111</width>
       <height>41</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>Stop time</string>
+     <string>STOP TIME</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txt_dt">
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>670</y>
+      <y>550</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1943,7 +2025,7 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>470</y>
+      <y>610</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1962,7 +2044,7 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>520</y>
+      <y>660</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -1981,9 +2063,9 @@
     <property name="geometry">
      <rect>
       <x>1290</x>
-      <y>720</y>
+      <y>710</y>
       <width>111</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
