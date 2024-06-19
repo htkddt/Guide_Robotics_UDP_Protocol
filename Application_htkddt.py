@@ -178,8 +178,6 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
-    # Create style button
-
     def con_dis_robot_action(self):
         if self.uic.btn_Connect_Disconnect.text() == "Connect":
             self.uic.btn_Connect_Disconnect.setText("Disconnect")
