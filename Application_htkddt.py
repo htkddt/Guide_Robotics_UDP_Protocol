@@ -178,6 +178,77 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
+    def set_button_style(self):
+        self.uic.btn_Robot_ConDis.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
+        self.uic.btn_Serial_ConDis.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
+        self.uic.btn_YOLO_detect.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
+        self.uic.btn_COLOR_Detect.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
+        self.uic.btn_Servo.setStyleSheet("""
+            QPushButton {
+                background-color: #2ecc71;
+                color: black;
+                font-size: 20px;
+            }
+            QPushButton:hover {
+                background-color: #27ae60;
+            }
+            QPushButton:pressed {
+                background-color: #1abc9c;
+            }
+        """)
+
     def con_dis_robot_action(self):
         if self.uic.btn_Connect_Disconnect.text() == "Connect":
             self.uic.btn_Connect_Disconnect.setText("Disconnect")
