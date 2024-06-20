@@ -37,6 +37,12 @@ class MainWindow():
 """
 
 
+# Note:
+# Check Mode control: Auto Button and Manual Button
+# Check style button of set_button_style function
+# Coding classify and update position in Job Robot
+
+
 class MainWindow(QMainWindow):
     # Khai báo MainWindow() loại 2
 
