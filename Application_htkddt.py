@@ -184,6 +184,24 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
+    def frame_data_send(self, Data_Part, Request_ID, Command, Instance, Attribute, Service, Data):
+        Identifier = bytes([0x59, 0x45, 0x52, 0x43])  # YERC
+        Header = bytes([0x20, 0x00])
+        Reserve_1 = bytes([0x03])
+        Processing_div = bytes([0x01])
+        ACK = bytes([0x00])
+        Block_No = bytes([0x00, 0x00, 0x00, 0x00])
+        Reserve_2 = bytes([0x39, 0x39, 0x39, 0x39, 0x39, 0x39, 0x39, 0x39])
+        Padding = bytes([0x00, 0x00])
+        Data_Part_Length = int.from_bytes(Data_Part, byteorder='little', signed=True)
+
+        format_frame = struct.Struct(f'!4s 2s 2s 1s 1s 1s 1s 4s 8s 2s 2s 1s 1s 2s {Data_Part_Length}s')
+
+        frame_data = format_frame.pack(Identifier, Header, Data_Part, Reserve_1, Processing_div, ACK, Request_ID,
+                                       Block_No, Reserve_2, Command, Instance, Attribute, Service, Padding, Data)
+
+        return frame_data
+
     def set_button_style(self):
         self.uic.btn_Robot_ConDis.setStyleSheet("""
             QPushButton {
@@ -289,14 +307,6 @@ class MainWindow(QMainWindow):
             self.serial.serial_disconnect()
             self.uic.lb_Connect_Disconnect_.setText("Disconnected")
 
-    def mode_auto(self):
-        self.flag_Auto = True
-        self.flag_Manual = False
-
-    def mode_manual(self):
-        self.flag_Auto = False
-        self.flag_Manual = True
-
     def open_close_action(self):
         self.camera.flag_Detect_YOLO = False
         self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
@@ -334,23 +344,115 @@ class MainWindow(QMainWindow):
                 self.flag_Depth = False
                 self.camera.quit()
 
-    def frame_data_send(self, Data_Part, Request_ID, Command, Instance, Attribute, Service, Data):
-        Identifier = bytes([0x59, 0x45, 0x52, 0x43])  # YERC
-        Header = bytes([0x20, 0x00])
-        Reserve_1 = bytes([0x03])
-        Processing_div = bytes([0x01])
-        ACK = bytes([0x00])
-        Block_No = bytes([0x00, 0x00, 0x00, 0x00])
-        Reserve_2 = bytes([0x39, 0x39, 0x39, 0x39, 0x39, 0x39, 0x39, 0x39])
-        Padding = bytes([0x00, 0x00])
-        Data_Part_Length = int.from_bytes(Data_Part, byteorder='little', signed=True)
+    def mode_auto(self):
+        self.flag_Auto = True
+        self.flag_Manual = False
 
-        format_frame = struct.Struct(f'!4s 2s 2s 1s 1s 1s 1s 4s 8s 2s 2s 1s 1s 2s {Data_Part_Length}s')
+    def mode_manual(self):
+        self.flag_Auto = False
+        self.flag_Manual = True
 
-        frame_data = format_frame.pack(Identifier, Header, Data_Part, Reserve_1, Processing_div, ACK, Request_ID,
-                                       Block_No, Reserve_2, Command, Instance, Attribute, Service, Padding, Data)
+    def update_txt1_Dis(self):
+        value = self.uic.slider_Dis_mm.value()
+        self.uic.txt1_Dis_Value.setText(str(value))
 
-        return frame_data
+    def update_txt2_Dis(self):
+        value = self.uic.slider_Dis_deg.value()
+        self.uic.txt2_Dis_Value.setText(str(value))
+
+    def update_txt1_Spe(self):
+        value = self.uic.slider_Spe_mm.value()
+        self.uic.txt1_Spe_Value.setText(str(value))
+
+    def update_txt2_Spe(self):
+        value = self.uic.slider_Spe_deg.value()
+        self.uic.txt2_Spe_Value.setText(str(value))
+
+    def update_txt_Pulse(self):
+        Value = self.uic.txt_Pulse.text()
+        self.serial_process_action(Value)
+
+    def display_RGB_frame(self):
+        self.flag_RGB = True
+        self.flag_Binary = False
+        self.flag_Depth = False
+
+    def display_Binary_frame(self):
+        self.flag_RGB = False
+        self.flag_Binary = True
+        self.flag_Depth = False
+
+    def display_Depth_frame(self):
+        self.flag_RGB = False
+        self.flag_Binary = False
+        self.flag_Depth = True
+
+    def capture_aruco_action(self):
+        self.flag_Capture_ArUco = True
+
+    def capture_object_action(self):
+        self.flag_Capture_Object = True
+
+    def capture_background_action(self):
+        self.flag_Capture_Background = True
+
+    def aruco_detect_action(self):
+        if self.uic.btn_Aruco_Detect.text() == "ArUco Detect ON":
+            self.flag_Detect_ArUco = True
+            self.camera.flag_Detect_COLOR = False
+            self.camera.flag_Detect_YOLO = False
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect OFF")
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+
+        elif self.uic.btn_Aruco_Detect.text() == "ArUco Detect OFF":
+            self.flag_Detect_ArUco = False
+            self.camera.flag_Detect_COLOR = False
+            self.camera.flag_Detect_YOLO = False
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+
+    def COLOR_detect_action(self):
+        if self.uic.btn_COLOR_Detect.text() == "COLOR Detect ON":
+            self.camera.flag_Detect_COLOR = True
+            self.flag_Detect_ArUco = False
+            self.camera.flag_Detect_YOLO = False
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect OFF")
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
+            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+
+        elif self.uic.btn_COLOR_Detect.text() == "COLOR Detect OFF":
+            self.camera.flag_Detect_COLOR = False
+            self.flag_Detect_ArUco = False
+            self.camera.flag_Detect_YOLO = False
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
+            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+
+    def YOLO_detect_action(self):
+        if self.uic.btn_YOLO_detect.text() == "YOLO Detect ON":
+            self.camera.flag_Detect_YOLO = True
+            self.flag_Detect_ArUco = False
+            self.camera.flag_Detect_COLOR = False
+            self.uic.btn_YOLO_detect.setText("YOLO Detect OFF")
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+
+        elif self.uic.btn_YOLO_detect.text() == "YOLO Detect OFF":
+            self.camera.flag_Detect_YOLO = False
+            self.flag_Detect_ArUco = False
+            self.camera.flag_Detect_COLOR = False
+            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
+            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+
+    def start_time(self):
+        self.run_time = time.time()
+
+    def stop_time(self):
+        self.end_time = time.time()
+        self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
 
     def axis_config_function(self):
         Data_Part = bytes([0x04, 0x00])
@@ -718,101 +820,6 @@ class MainWindow(QMainWindow):
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
-    def update_txt1_Dis(self):
-        value = self.uic.slider_Dis_mm.value()
-        self.uic.txt1_Dis_Value.setText(str(value))
-
-    def update_txt2_Dis(self):
-        value = self.uic.slider_Dis_deg.value()
-        self.uic.txt2_Dis_Value.setText(str(value))
-
-    def update_txt1_Spe(self):
-        value = self.uic.slider_Spe_mm.value()
-        self.uic.txt1_Spe_Value.setText(str(value))
-
-    def update_txt2_Spe(self):
-        value = self.uic.slider_Spe_deg.value()
-        self.uic.txt2_Spe_Value.setText(str(value))
-
-    def update_txt_Pulse(self):
-        Value = self.uic.txt_Pulse.text()
-        self.serial_process_action(Value)
-
-    def display_RGB_frame(self):
-        self.flag_RGB = True
-        self.flag_Binary = False
-        self.flag_Depth = False
-
-    def display_Binary_frame(self):
-        self.flag_RGB = False
-        self.flag_Binary = True
-        self.flag_Depth = False
-
-    def display_Depth_frame(self):
-        self.flag_RGB = False
-        self.flag_Binary = False
-        self.flag_Depth = True
-
-    def capture_aruco_action(self):
-        self.flag_Capture_ArUco = True
-
-    def capture_object_action(self):
-        self.flag_Capture_Object = True
-
-    def capture_background_action(self):
-        self.flag_Capture_Background = True
-
-    def aruco_detect_action(self):
-        if self.uic.btn_Aruco_Detect.text() == "ArUco Detect ON":
-            self.flag_Detect_ArUco = True
-            self.camera.flag_Detect_COLOR = False
-            self.camera.flag_Detect_YOLO = False
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect OFF")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-
-        elif self.uic.btn_Aruco_Detect.text() == "ArUco Detect OFF":
-            self.flag_Detect_ArUco = False
-            self.camera.flag_Detect_COLOR = False
-            self.camera.flag_Detect_YOLO = False
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-
-    def COLOR_detect_action(self):
-        if self.uic.btn_COLOR_Detect.text() == "COLOR Detect ON":
-            self.camera.flag_Detect_COLOR = True
-            self.flag_Detect_ArUco = False
-            self.camera.flag_Detect_YOLO = False
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect OFF")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-
-        elif self.uic.btn_COLOR_Detect.text() == "COLOR Detect OFF":
-            self.camera.flag_Detect_COLOR = False
-            self.flag_Detect_ArUco = False
-            self.camera.flag_Detect_YOLO = False
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-
-    def YOLO_detect_action(self):
-        if self.uic.btn_YOLO_detect.text() == "YOLO Detect ON":
-            self.camera.flag_Detect_YOLO = True
-            self.flag_Detect_ArUco = False
-            self.camera.flag_Detect_COLOR = False
-            self.uic.btn_YOLO_detect.setText("YOLO Detect OFF")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-
-        elif self.uic.btn_YOLO_detect.text() == "YOLO Detect OFF":
-            self.camera.flag_Detect_YOLO = False
-            self.flag_Detect_ArUco = False
-            self.camera.flag_Detect_COLOR = False
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-
     def job_select_function(self, Data_Part, Data):
         Data_Part = Data_Part.to_bytes(2, byteorder='little', signed=True)
         Request_ID = bytes([0xFF])
@@ -886,6 +893,29 @@ class MainWindow(QMainWindow):
         self.set_byte_action(0, 2)
         self.set_byte_action(0, 3)
         # self.go_home_action()
+
+    def pos_pick_action(self):
+        self.flag_Enable_Job = True
+        print("X = " + str(self.X_))
+        print("Y = " + str(self.Y_))
+        print("Z = " + str(self.Z_))
+        print("Roll = " + str(self.Roll_))
+        print("Pitch = " + str(self.Pitch_))
+        print("Yaw = " + str(self.Yaw_))
+
+    def move_test_action(self):
+        X_ = self.X_
+        Y_ = self.Y_
+        Z_ = self.Z_
+        Roll_ = self.Roll_
+        Pitch_ = self.Pitch_
+        Yaw_ = self.Yaw_
+
+        self.move_command_action(0, int(X_), int(Y_), 35000,
+                                 int(Roll_), int(Pitch_), int(Yaw_))
+        time.sleep(3)
+        self.move_command_action(0, int(X_), int(Y_), int(Z_),
+                                 int(Roll_), int(Pitch_), int(Yaw_))
 
     def set_byte_action(self, Data, Ins):
         # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
@@ -1036,36 +1066,6 @@ class MainWindow(QMainWindow):
         Data = bytes(Data)
 
         self.serial.sendSerial(Data)
-
-    def start_time(self):
-        self.run_time = time.time()
-
-    def stop_time(self):
-        self.end_time = time.time()
-        self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
-
-    def pos_pick_action(self):
-        self.flag_Enable_Job = True
-        print("X = " + str(self.X_))
-        print("Y = " + str(self.Y_))
-        print("Z = " + str(self.Z_))
-        print("Roll = " + str(self.Roll_))
-        print("Pitch = " + str(self.Pitch_))
-        print("Yaw = " + str(self.Yaw_))
-
-    def move_test_action(self):
-        X_ = self.X_
-        Y_ = self.Y_
-        Z_ = self.Z_
-        Roll_ = self.Roll_
-        Pitch_ = self.Pitch_
-        Yaw_ = self.Yaw_
-
-        self.move_command_action(0, int(X_), int(Y_), 35000,
-                                 int(Roll_), int(Pitch_), int(Yaw_))
-        time.sleep(3)
-        self.move_command_action(0, int(X_), int(Y_), int(Z_),
-                                 int(Roll_), int(Pitch_), int(Yaw_))
 
     def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
         print("Status detect: " + str(flag_last_id))
