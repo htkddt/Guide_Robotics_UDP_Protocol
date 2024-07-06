@@ -510,12 +510,21 @@ class MainWindow(QMainWindow):
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 1)
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4)
+####################################################################################
+                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4) #Class 0
+                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 5) #Class 1
+                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 6) #Class 2
+                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 7) #Class 3
+                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 8) #Class 4
+####################################################################################
                     self.set_byte_action(0, 1)
                     self.set_byte_action(0, 2)
                     self.set_byte_action(0, 3)
                     self.set_byte_action(0, 4)
+                    self.set_byte_action(0, 5)
+                    self.set_byte_action(5, 6)
                     self.set_byte_action(1, 0)
+####################################################################################
                     self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
@@ -849,7 +858,7 @@ class MainWindow(QMainWindow):
         self.socket.send_function(frame)
         self.socket.received_function()
 
-    def move_job_action(self):
+    def move_job_action(self, class_id):
         if self.uic.btn_Move_Job.text() == "MOVE JOB":
             ret = self.job_select_function(7, b'MOVEJOB')
             if ret:
@@ -875,6 +884,7 @@ class MainWindow(QMainWindow):
             self.set_position_action(int(self.X_), int(self.Y_), int(self.Z_),
                                      int(self.Roll_), int(self.Pitch_), int(self.Yaw_),
                                      3)
+            self.set_byte_action(class_id, 6)
             self.set_byte_action(1, 2)
             self.set_byte_action(0, 5)
             if self.flag_Manual:
@@ -1067,7 +1077,7 @@ class MainWindow(QMainWindow):
 
         self.serial.sendSerial(Data)
 
-    def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
+    def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, class_id, point_u, point_v, angle):
         print("Status detect: " + str(flag_last_id))
         print("u = " + str(point_u))
         print("v = " + str(point_v))
@@ -1208,7 +1218,7 @@ class MainWindow(QMainWindow):
                         self.flag_Data_Position = False
 
                         if self.flag_Process:
-                            self.move_job_action()
+                            self.move_job_action(class_id)
                             self.flag_Process = False
 
             elif self.camera.flag_Detect_YOLO:
@@ -1222,7 +1232,6 @@ class MainWindow(QMainWindow):
                                        [1.0]])
                         Wr = self.T_cam2base.dot(Wc)
 
-                        # if Wr[0][0] > 200 & Wr[0][0] < 280 * Wr[1][0] > (-190) & Wr[1][0] < 10:
                         self.X_ = Wr[0][0] * 1000 + 15000
                         self.Y_ = Wr[1][0] * 1000 + 73000
                         self.Z_ = Wr[2][0] * 1000 - 5000
@@ -1241,7 +1250,7 @@ class MainWindow(QMainWindow):
 
                         if self.flag_Process:
                             if self.flag_Enable_Job:
-                                self.move_job_action()
+                                self.move_job_action(class_id)
                                 self.flag_Process = False
 
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
@@ -1433,7 +1442,7 @@ class RobotSocket(QThread):
 
 
 class CameraThread(QThread):
-    image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
+    image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, int, float)
 
     def __init__(self):
         super(CameraThread, self).__init__()
@@ -1445,6 +1454,7 @@ class CameraThread(QThread):
     def run(self):
         binary_frame = None
         obj = None
+        last_id = None
         flag_last_id = False
         point_center = None
         u = 0
@@ -1530,7 +1540,7 @@ class CameraThread(QThread):
                     v = 0
                     angle = 0
 
-                self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, u, v, angle)
+                self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, last_id, u, v, angle)
 
     def matrix(self):
         _, _, _, matrix, _, dist = self.rs.get_frame_stream()
