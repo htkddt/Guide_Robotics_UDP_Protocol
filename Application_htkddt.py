@@ -64,6 +64,7 @@ class MainWindow(QMainWindow):
         self.fy = None
         self.cx = None
         self.cy = None
+        self.pre_ID = 4
 
         self.X_ = None
         self.Y_ = None
@@ -75,7 +76,7 @@ class MainWindow(QMainWindow):
         # self.Mode_Control = self.uic.cBox_Mode.currentText()
         # print("Mode control: " + self.Mode_Control)
 
-        self.flag_Auto = None
+        self.flag_Auto = True
         self.flag_Manual = None
 
         self.flag_Capture_ArUco = None
@@ -177,6 +178,8 @@ class MainWindow(QMainWindow):
         self.uic.btn_Binary.clicked.connect(self.display_Binary_frame)
         self.uic.btn_Depth.clicked.connect(self.display_Depth_frame)
 
+        self.set_button_style()
+
     def close(self):
         self.camera.running = False
         self.flag_RGB = False
@@ -209,12 +212,6 @@ class MainWindow(QMainWindow):
                 color: black;
                 font-size: 20px;
             }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
         """)
 
         self.uic.btn_Serial_ConDis.setStyleSheet("""
@@ -222,12 +219,6 @@ class MainWindow(QMainWindow):
                 background-color: #2ecc71;
                 color: black;
                 font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
             }
         """)
 
@@ -237,12 +228,6 @@ class MainWindow(QMainWindow):
                 color: black;
                 font-size: 20px;
             }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
         """)
 
         self.uic.btn_COLOR_Detect.setStyleSheet("""
@@ -250,12 +235,6 @@ class MainWindow(QMainWindow):
                 background-color: #2ecc71;
                 color: black;
                 font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
             }
         """)
 
@@ -265,17 +244,11 @@ class MainWindow(QMainWindow):
                 color: black;
                 font-size: 20px;
             }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
         """)
 
     def con_dis_robot_action(self):
-        if self.uic.btn_Connect_Disconnect.text() == "Connect":
-            self.uic.btn_Connect_Disconnect.setText("Disconnect")
+        if self.uic.btn_Robot_ConDis.text() == "Connect":
+            self.uic.btn_Robot_ConDis.setText("Disconnect")
 
             # Lấy dữ liệu IP và Port
             IP = self.uic.txt_IP.text()
@@ -287,11 +260,23 @@ class MainWindow(QMainWindow):
             # self.conveyor.start()
             self.uic.lb_Connect_Disconnect.setText("Connected")
 
-        elif self.uic.btn_Connect_Disconnect.text() == "Disconnect":
-            self.uic.btn_Connect_Disconnect.setText("Connect")
+            self.uic.btn_Robot_ConDis.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                }
+            """)
+
+        elif self.uic.btn_Robot_ConDis.text() == "Disconnect":
+            self.uic.btn_Robot_ConDis.setText("Connect")
             self.socket.disconnect()
             # self.conveyor.disconnect()
             self.uic.lb_Connect_Disconnect.setText("Disconnected")
+
+            self.uic.btn_Robot_ConDis.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                }
+            """)
 
     def con_dis_serial_action(self):
         if self.uic.btn_Serial_ConDis.text() == "Connect":
@@ -302,10 +287,22 @@ class MainWindow(QMainWindow):
             self.serial.start()
             self.uic.lb_Connect_Disconnect_.setText("Connected")
 
+            self.uic.btn_Serial_ConDis.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                }
+            """)
+
         elif self.uic.btn_Serial_ConDis.text() == "Disconnect":
             self.uic.btn_Serial_ConDis.setText("Connect")
             self.serial.serial_disconnect()
             self.uic.lb_Connect_Disconnect_.setText("Disconnected")
+
+            self.uic.btn_Serial_ConDis.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                }
+            """)
 
     def open_close_action(self):
         self.camera.flag_Detect_YOLO = False
@@ -422,6 +419,12 @@ class MainWindow(QMainWindow):
             self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
             self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
 
+            self.uic.btn_COLOR_Detect.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                }
+            """)
+
         elif self.uic.btn_COLOR_Detect.text() == "COLOR Detect OFF":
             self.camera.flag_Detect_COLOR = False
             self.flag_Detect_ArUco = False
@@ -429,6 +432,12 @@ class MainWindow(QMainWindow):
             self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
             self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
             self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+
+            self.uic.btn_COLOR_Detect.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                }
+            """)
 
     def YOLO_detect_action(self):
         if self.uic.btn_YOLO_detect.text() == "YOLO Detect ON":
@@ -439,6 +448,12 @@ class MainWindow(QMainWindow):
             self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
             self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
 
+            self.uic.btn_YOLO_detect.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                }
+            """)
+
         elif self.uic.btn_YOLO_detect.text() == "YOLO Detect OFF":
             self.camera.flag_Detect_YOLO = False
             self.flag_Detect_ArUco = False
@@ -446,6 +461,12 @@ class MainWindow(QMainWindow):
             self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
             self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
             self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+
+            self.uic.btn_YOLO_detect.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                }
+            """)
 
     def start_time(self):
         self.run_time = time.time()
@@ -507,28 +528,34 @@ class MainWindow(QMainWindow):
             if self.socket.flag_connected:
                 status = self.axis_config_function()
                 if status:
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 1)
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
-####################################################################################
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4) #Class 0
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 5) #Class 1
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 6) #Class 2
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 7) #Class 3
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 8) #Class 4
-####################################################################################
+                    self.set_position_action(230000, 0, 10000, 1800000, 0, 0, 1)
+                    self.set_position_action(230000, 0, 10000, 1800000, 0, 0, 2)
+                    self.set_position_action(230000, 0, 10000, 1800000, 0, 0, 3)
+                    ####################################################################################
+                    self.set_position_action(71129, -185561, 10000, 1800000, 0, -900000, 4)  # Class 0
+                    self.set_position_action(71129, -273762, 10000, 1800000, 0, -900000, 5)  # Class 1
+                    self.set_position_action(-123467, -185561, 10000, 1800000, 0, -900000, 6)  # Class 2
+                    self.set_position_action(-123467, -283555, 10000, 1800000, 0, -900000, 7)  # Class 3
+                    # self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 8)  # Class 4
+                    ####################################################################################
                     self.set_byte_action(0, 1)
                     self.set_byte_action(0, 2)
                     self.set_byte_action(0, 3)
                     self.set_byte_action(0, 4)
                     self.set_byte_action(0, 5)
-                    self.set_byte_action(5, 6)
+                    self.set_byte_action(4, 6)
                     self.set_byte_action(1, 0)
-####################################################################################
+                    ####################################################################################
                     self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
             self.uic.btn_Servo.setText("Servo Off")
+
+            self.uic.btn_Servo.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                }
+            """)
 
         elif self.uic.btn_Servo.text() == "Servo Off":
             Data = bytes([0x02, 0x00, 0x00, 0x00])
@@ -538,6 +565,12 @@ class MainWindow(QMainWindow):
             self.set_byte_action(0, 0)
             self.timer.stop()
             self.uic.btn_Servo.setText("Servo On")
+
+            self.uic.btn_Servo.setStyleSheet("""
+                QPushButton {
+                    background-color: #2ecc71;
+                }
+            """)
 
         self.get_position_action()
 
@@ -858,12 +891,12 @@ class MainWindow(QMainWindow):
         self.socket.send_function(frame)
         self.socket.received_function()
 
-    def move_job_action(self, class_id):
+    def move_job_action(self):
         if self.uic.btn_Move_Job.text() == "MOVE JOB":
             ret = self.job_select_function(7, b'MOVEJOB')
             if ret:
-                self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
-                self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
+                self.set_position_action(230000, 0, 10000, 1800000, 0, 0, 2)
+                self.set_position_action(230000, 0, 10000, 1800000, 0, 0, 3)
                 self.set_byte_action(1, 1)
                 self.start_job_function()
             self.flag_Enable_Job = True
@@ -878,13 +911,12 @@ class MainWindow(QMainWindow):
                 self.uic.btn_Move_Job.setText("RUNNING")
 
         elif self.uic.btn_Move_Job.text() == "RUNNING":
-            self.set_position_action(int(self.X_), int(self.Y_), 27000,
+            self.set_position_action(int(self.X_), int(self.Y_), 10000,
                                      int(self.Roll_), int(self.Pitch_), int(self.Yaw_),
                                      2)
             self.set_position_action(int(self.X_), int(self.Y_), int(self.Z_),
                                      int(self.Roll_), int(self.Pitch_), int(self.Yaw_),
                                      3)
-            self.set_byte_action(class_id, 6)
             self.set_byte_action(1, 2)
             self.set_byte_action(0, 5)
             if self.flag_Manual:
@@ -1077,11 +1109,14 @@ class MainWindow(QMainWindow):
 
         self.serial.sendSerial(Data)
 
-    def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, class_id, point_u, point_v, angle):
+    def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, class_id, point_u, point_v,
+                     angle):
         print("Status detect: " + str(flag_last_id))
         print("u = " + str(point_u))
         print("v = " + str(point_v))
         print("angle = " + str(angle))
+        if class_id != 4:
+            self.pre_ID = class_id
 
         rve = None
         tve = None
@@ -1218,7 +1253,7 @@ class MainWindow(QMainWindow):
                         self.flag_Data_Position = False
 
                         if self.flag_Process:
-                            self.move_job_action(class_id)
+                            self.move_job_action()
                             self.flag_Process = False
 
             elif self.camera.flag_Detect_YOLO:
@@ -1250,7 +1285,9 @@ class MainWindow(QMainWindow):
 
                         if self.flag_Process:
                             if self.flag_Enable_Job:
-                                self.move_job_action(class_id)
+                                self.uic.txt_Status.setText("ID: " + str(self.pre_ID))
+                                self.set_byte_action(int(self.pre_ID), 6)
+                                self.move_job_action()
                                 self.flag_Process = False
 
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
@@ -1280,7 +1317,7 @@ class MainWindow(QMainWindow):
         elif not self.flag_Select:
             if self.flag_Enable_Job:
                 status = self.get_byte_action(5)
-                self.uic.txt_Status.setText("Byte 5 = " + str(status))
+                # self.uic.txt_Status.setText("Byte 5 = " + str(status))
                 if status == 0:
                     self.flag_Process = False
                     self.uic.lb_Gripper.setText("Gripper: None")
@@ -1454,7 +1491,7 @@ class CameraThread(QThread):
     def run(self):
         binary_frame = None
         obj = None
-        last_id = None
+        last_id = 4
         flag_last_id = False
         point_center = None
         u = 0
@@ -1480,6 +1517,8 @@ class CameraThread(QThread):
                 br_point = (max_X, max_Y)
                 cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
 
+                # binary_frame = black_frame
+
                 binary_float32 = self.yoloSegment.getSegment(color_frame)
 
                 if binary_float32 is None:
@@ -1499,6 +1538,11 @@ class CameraThread(QThread):
 
                     else:
                         if point_center[0] > mean:
+                            # binary_float32 = self.yoloSegment.getSegment(color_frame)
+                            # binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX,
+                            #                                   dtype=cv2.CV_8U)
+                            # binary_frame = binary_normalized.astype(np.uint8)
+
                             contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                             for c in contour_box:
                                 area = cv2.contourArea(c)
@@ -1539,6 +1583,7 @@ class CameraThread(QThread):
                     u = 0
                     v = 0
                     angle = 0
+                    last_id = 4
 
                 self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, last_id, u, v, angle)
 

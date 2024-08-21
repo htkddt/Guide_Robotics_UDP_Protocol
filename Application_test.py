@@ -48,12 +48,6 @@ class MainWindow(QMainWindow):
                 color: black;
                 font-size: 20px;
             }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
         """)
 
         self.uic.btn_Detect.setStyleSheet("""
@@ -62,12 +56,6 @@ class MainWindow(QMainWindow):
                 color: black;
                 font-size: 20px;
             }
-            QPushButton:hover {
-                background-color: #3498db;
-            }
-            QPushButton:pressed {
-                background-color: #34495e;
-            }
         """)
 
         self.uic.btn_Close.setStyleSheet("""
@@ -75,12 +63,6 @@ class MainWindow(QMainWindow):
                 background-color: #c0392b;
                 color: black;
                 font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #e74c3c;
-            }
-            QPushButton:pressed {
-                background-color: #f1c40f;
             }
         """)
 
@@ -100,16 +82,12 @@ class MainWindow(QMainWindow):
             self.uic.btn_Open.setStyleSheet("""
                 QPushButton {
                     background-color: #c0392b;
-                    color: black;
-                    font-size: 20px;
                 }
             """)
 
             self.uic.btn_Close.setStyleSheet("""
                 QPushButton {
                     background-color: #2ecc71;
-                    color: black;
-                    font-size: 20px;
                 }
             """)
 
@@ -134,14 +112,6 @@ class MainWindow(QMainWindow):
         self.uic.btn_Detect.setStyleSheet("""
             QPushButton {
                 background-color: #2980b9;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #3498db;
-            }
-            QPushButton:pressed {
-                background-color: #34495e;
             }
         """)
 
@@ -204,16 +174,12 @@ class MainWindow(QMainWindow):
         self.uic.btn_Open.setStyleSheet("""
             QPushButton {
                 background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
             }
         """)
 
         self.uic.btn_Close.setStyleSheet("""
             QPushButton {
                 background-color: #c0392b;
-                color: black;
-                font-size: 20px;
             }
         """)
 
