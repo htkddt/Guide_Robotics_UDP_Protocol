@@ -1,20 +1,10 @@
-import sys
-import cv2
 import time
-import imutils
-import argparse
-import math
-import numpy as np
 
-import Cam2base
+from CalibrationSource import Cam2base
 
-from imutils import perspective
-from imutils import contours
-
-from ultralytics import YOLO
-from YoloSegmentation import *
-from YoloDetection import *
-from RealsenseCamera import *
+from ObjectProcess.YoloSegmentation import *
+from ObjectProcess.YoloDetection import *
+from CameraSource.RealsenseCamera import *
 
 
 def drawAxis(img, p_, q_, colour, scale):

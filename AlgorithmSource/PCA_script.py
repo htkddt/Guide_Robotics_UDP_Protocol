@@ -1,14 +1,6 @@
-import sys
-import cv2
-import imutils
-import argparse
 import math
-import numpy as np
 
-from imutils import perspective
-from imutils import contours
-
-from RealsenseCamera import *
+from CameraSource.RealsenseCamera import *
 
 
 def drawAxis(img, p_, q_, colour, scale):

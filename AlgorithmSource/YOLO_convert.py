@@ -1,8 +1,6 @@
-import sys
-import cv2
 import os
 
-from YoloDetection import *
+from ObjectProcess.YoloDetection import *
 
 yoloDetect = YoloDetection()
 

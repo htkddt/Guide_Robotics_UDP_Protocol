@@ -1,28 +1,20 @@
-import math
 import os
-import sys
-import cv2
 import struct
 import socket
 import time
-import scipy
 import serial
-import numpy as np
 
-import Cam2base
-import ArUcoDetection
-import ColorDetection
+from CalibrationSource import Cam2base
+from ObjectProcess import ColorDetection, ArUcoDetection
 
 from PyQt5.QtCore import QThread, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QApplication
 
-from scipy.spatial.transform import Rotation
-from pymodbus.client import ModbusTcpClient
-from RealsenseCamera import *
-from YoloDetection import *
-from YoloSegmentation import *
-from Guide_htkddt import Ui_MainWindow
+from CameraSource.RealsenseCamera import *
+from ObjectProcess.YoloDetection import *
+from ObjectProcess.YoloSegmentation import *
+from ApplicationUI.Guide_htkddt import Ui_MainWindow
 
 """
 # Khai báo MainWindow() loại 1
