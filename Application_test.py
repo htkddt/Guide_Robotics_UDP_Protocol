@@ -1,20 +1,9 @@
-import sys
-import cv2
-import imutils
-import argparse
-import math
-import numpy as np
-
-from imutils import perspective
-from imutils import contours
-
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 
-from YoloDetection import *
-from YoloSegmentation import *
-from Guide_test import *
+from OBJECT_Process.YoloDetection import *
+from OBJECT_Process.YoloSegmentation import *
+from GUI_User_Interface.Guide_test import *
 
 
 class MainWindow(QMainWindow):

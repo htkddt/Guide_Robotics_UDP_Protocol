@@ -1,11 +1,5 @@
 import os
-import sys
-import cv2
-import numpy as np
-import scipy
-import math
-import imutils
-from RealsenseCamera import *
+from CAMERA_Source.RealsenseCamera import *
 # R_target2cam (3x3): Ma trận xoay giữa Aruco và Camera (Opencv)
 # t_target2cam (3x1): Ma trận dịch chuyển giữa Aruco và Camera tại tâm của Aruco (Opencv)
 

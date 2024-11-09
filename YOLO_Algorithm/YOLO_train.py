@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 # Load model
-model = YOLO("yolov8n.pt")
+model = YOLO("../yolov8n.pt")
 # model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train/weights/best.pt")
 # model = YOLO("yolov8n-seg.pt")
 # model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/segment/train/weights/best.pt")
