@@ -38,12 +38,38 @@ class MainWindow(QMainWindow):
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self)
 
+        self.DEVICE_ROBOT = False
+        self.uic.btn_Device_Robot.setStyleSheet(""" 
+            QPushButton {
+                background-color: #c0392b;
+                color: black;
+                font-size: 20px;
+            }""")
+        self.uic.btn_Device_Robot.clicked.connect(self.device_robot_status)
+
+        self.DEVICE_IO = False
+        self.uic.btn_Device_IO.setStyleSheet(""" 
+            QPushButton {
+                background-color: #c0392b;
+                color: black;
+                font-size: 20px;
+            }""")
+        self.uic.btn_Device_IO.clicked.connect(self.device_io_status)
+
+        # Camera calibration
+        # Create ArUco dictionary
+        self.arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_250)
+        # Create ArUco parameters
+        self.arucoParams = cv2.aruco.DetectorParameters()
+        # Create ArUcoDetector object
+        self.detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
+
+        # Collect data for training model
         self.index_data = 0
         self.index_folder = 4
 
-        self.uic.lb_Gripper.setText("Gripper: None")
-        self.uic.txt_dt.setText("0")
-
+        # Define inital value
+        # Camera
         self.Int_matrix = None
         self.T_cam2base = None
         self.fx = None
@@ -51,6 +77,7 @@ class MainWindow(QMainWindow):
         self.cx = None
         self.cy = None
 
+        # Position group
         self.X_ = None
         self.Y_ = None
         self.Z_ = None
@@ -58,110 +85,97 @@ class MainWindow(QMainWindow):
         self.Pitch_ = None
         self.Yaw_ = None
 
-        # self.Mode_Control = self.uic.cBox_Mode.currentText()
-        # print("Mode control: " + self.Mode_Control)
-
+        # Define MODE flag
         self.flag_Auto = None
         self.flag_Manual = None
 
-        self.flag_Capture_ArUco = None
-        self.flag_Capture_Object = None
-        self.flag_Capture_Background = None
+        # Define BUTTON flag
+        # Camera
         self.flag_RGB = None
         self.flag_Binary = None
         self.flag_Depth = None
-        self.flag_GetPoint = None
+        # Capture data
+        self.flag_Capture_ArUco = None
+        self.flag_Capture_Object = None
+        # Job
         self.flag_Enable_Job = None
         self.flag_Data_Position = None
         self.flag_Process = None
         self.flag_Select = None
-
+        # Detect button
         self.flag_Detect_ArUco = None
         self.flag_Detect_Color = None
         self.flag_Detect_YoLo = None
+        # Background
+        self.flag_Capture_Background = None
 
-        self.flag_Conveyor = None
+        # self.flag_GetPoint = None
 
-        # Khởi tạo ArUco dictionary
-        self.arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_250)
-        # Khởi tạo ArUco parameters
-        self.arucoParams = cv2.aruco.DetectorParameters()
-        # Khởi tạo đối tượng ArUcoDetector
-        self.detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
+        # Define status text
+        self.uic.lb_Mode_Value.setText("None")
+        self.uic.lb_Gripper.setText("Gripper: None")
+        self.uic.txt_dt.setText("0.00")
+        self.uic.txt_Status.setText("Byte 5 = 0")
 
-        self.socket = RobotSocket()
-        # self.conveyor = ConveyorSocket()
-
-        self.serial = SerialProcess()
-        self.serial.message.connect(self.update_serial)
-        self.method = 0
-
-        self.camera = CameraThread()
-        self.camera.image.connect(self.update_frame)
-
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_timer)
-
+        # Handle event
+        # Connect group
+        self.uic.btn_Robot_ConDis.clicked.connect(self.con_dis_robot_action)
+        self.uic.btn_Serial_ConDis.clicked.connect(self.con_dis_serial_action)
+        # Incremental group
         self.uic.slider_Dis_mm.valueChanged.connect(self.update_txt1_Dis)
         self.uic.slider_Dis_deg.valueChanged.connect(self.update_txt2_Dis)
         self.uic.slider_Spe_mm.valueChanged.connect(self.update_txt1_Spe)
         self.uic.slider_Spe_deg.valueChanged.connect(self.update_txt2_Spe)
-
-        # self.uic.cBox_Mode.currentIndexChanged.connect(self.update_mode)
+        self.uic.slider_Spe_Auto.valueChanged.connect(self.update_txt_Spe_Auto)
+        self.uic.btn_X_Inc.clicked.connect(self.X_Inc_action)
+        self.uic.btn_X_Dec.clicked.connect(self.X_Dec_action)
+        self.uic.btn_Y_Inc.clicked.connect(self.Y_Inc_action)
+        self.uic.btn_Y_Dec.clicked.connect(self.Y_Dec_action)
+        self.uic.btn_Z_Inc.clicked.connect(self.Z_Inc_action)
+        self.uic.btn_Z_Dec.clicked.connect(self.Z_Dec_action)
+        self.uic.btn_Roll_Inc.clicked.connect(self.Roll_Inc_action)
+        self.uic.btn_Roll_Dec.clicked.connect(self.Roll_Dec_action)
+        self.uic.btn_Pitch_Inc.clicked.connect(self.Pitch_Inc_action)
+        self.uic.btn_Pitch_Dec.clicked.connect(self.Pitch_Dec_action)
+        self.uic.btn_Yaw_Inc.clicked.connect(self.Yaw_Inc_action)
+        self.uic.btn_Yaw_Dec.clicked.connect(self.Yaw_Dec_action)
+        # Basic Control group
         self.uic.btn_Auto.clicked.connect(self.mode_auto)
         self.uic.btn_Manual.clicked.connect(self.mode_manual)
-        self.uic.btn_Robot_ConDis.clicked.connect(self.con_dis_robot_action)
-        self.uic.btn_Serial_ConDis.clicked.connect(self.con_dis_serial_action)
-        self.uic.btn_Open_Close.clicked.connect(self.open_close_action)
-
         self.uic.btn_Servo.clicked.connect(self.servo_action)
         self.uic.btn_Home.clicked.connect(self.go_home_action)
-
+        self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
+        # Get Position group
         self.uic.btn_Get_Position.clicked.connect(self.get_position_action)
 
-        # self.uic.btn_Conveyor.clicked.connect(self.conveyor_action)
-
-        self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
-
+        # Button
+        # Camera
+        self.uic.btn_Open_Close.clicked.connect(self.open_close_action)
+        self.uic.btn_RGB.clicked.connect(self.display_RGB_frame)
+        self.uic.btn_Binary.clicked.connect(self.display_Binary_frame)
+        self.uic.btn_Depth.clicked.connect(self.display_Depth_frame)
+        self.uic.btn_Capture_Aruco.clicked.connect(self.capture_aruco_action)
+        self.uic.btn_Capture_Object.clicked.connect(self.capture_object_action)
+        # Job robot
+        self.uic.btn_Move_Job.clicked.connect(self.move_job_action)
+        self.uic.btn_Exit_Job.clicked.connect(self.exit_job_action)
+        # Detect option
+        self.uic.btn_Aruco_Detect.clicked.connect(self.aruco_detect_action)
+        self.uic.btn_COLOR_Detect.clicked.connect(self.COLOR_detect_action)
+        self.uic.btn_YOLO_detect.clicked.connect(self.YOLO_detect_action)
+        # Test Job button
+        self.uic.btn_Test_Job.clicked.connect(self.test_job_clicked)
+        # Timer button
         self.uic.btn_Start.clicked.connect(self.start_time)
         self.run_time = 0
         self.uic.btn_Stop.clicked.connect(self.stop_time)
         self.end_time = 0
-
-        self.uic.btn_X_Inc.clicked.connect(self.X_Inc_action)
-        self.uic.btn_X_Dec.clicked.connect(self.X_Dec_action)
-
-        self.uic.btn_Y_Inc.clicked.connect(self.Y_Inc_action)
-        self.uic.btn_Y_Dec.clicked.connect(self.Y_Dec_action)
-
-        self.uic.btn_Z_Inc.clicked.connect(self.Z_Inc_action)
-        self.uic.btn_Z_Dec.clicked.connect(self.Z_Dec_action)
-
-        self.uic.btn_Roll_Inc.clicked.connect(self.Roll_Inc_action)
-        self.uic.btn_Roll_Dec.clicked.connect(self.Roll_Dec_action)
-
-        self.uic.btn_Pitch_Inc.clicked.connect(self.Pitch_Inc_action)
-        self.uic.btn_Pitch_Dec.clicked.connect(self.Pitch_Dec_action)
-
-        self.uic.btn_Yaw_Inc.clicked.connect(self.Yaw_Inc_action)
-        self.uic.btn_Yaw_Dec.clicked.connect(self.Yaw_Dec_action)
-
-        self.uic.btn_Move_Job.clicked.connect(self.move_job_action)
-        self.uic.btn_Exit_Job.clicked.connect(self.exit_job_action)
-        self.uic.btn_Pos_pick.clicked.connect(self.pos_pick_action)
-        self.uic.btn_Move_test.clicked.connect(self.move_test_action)
-
-        self.uic.btn_Capture_Aruco.clicked.connect(self.capture_aruco_action)
-        self.uic.btn_Capture_Object.clicked.connect(self.capture_object_action)
+        # Position button
+        self.uic.btn_Pos_Pick.clicked.connect(self.pos_pick_clicked)
+        # Move button
+        self.uic.btn_Move_Test.clicked.connect(self.move_test_clicked)
+        # Background button
         self.uic.btn_Background.clicked.connect(self.capture_background_action)
-
-        self.uic.btn_Aruco_Detect.clicked.connect(self.aruco_detect_action)
-        self.uic.btn_COLOR_Detect.clicked.connect(self.COLOR_detect_action)
-        self.uic.btn_YOLO_detect.clicked.connect(self.YOLO_detect_action)
-
-        self.uic.btn_RGB.clicked.connect(self.display_RGB_frame)
-        self.uic.btn_Binary.clicked.connect(self.display_Binary_frame)
-        self.uic.btn_Depth.clicked.connect(self.display_Depth_frame)
 
     def close(self):
         self.camera.running = False
@@ -170,80 +184,67 @@ class MainWindow(QMainWindow):
         self.flag_Depth = False
         self.camera.quit()
 
-    def set_button_style(self):
-        self.uic.btn_Robot_ConDis.setStyleSheet("""
-            QPushButton {
-                background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
-        """)
+    # FEATURE FUNCTION OF PROJECT
+    def device_robot_status(self):
+        if not self.DEVICE_ROBOT:
+            self.DEVICE_ROBOT = True
 
-        self.uic.btn_Serial_ConDis.setStyleSheet("""
-            QPushButton {
-                background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
-        """)
+            # Robot socket
+            self.socket = RobotSocket()
 
-        self.uic.btn_YOLO_detect.setStyleSheet("""
-            QPushButton {
-                background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
-        """)
+            # Timer
+            self.timer = QTimer(self)
+            self.timer.timeout.connect(self.update_timer)
 
-        self.uic.btn_COLOR_Detect.setStyleSheet("""
-            QPushButton {
-                background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
-        """)
+            self.uic.btn_Device_Robot.setStyleSheet(""" 
+                QPushButton {
+                    background-color: #2ecc71;
+                    color: black;
+                    font-size: 20px;
+                }""")
+        else:
+            self.DEVICE_ROBOT = False
+            self.uic.btn_Device_Robot.setStyleSheet(""" 
+                QPushButton {
+                    background-color: #c0392b;
+                    color: black;
+                    font-size: 20px;
+                }""")
 
-        self.uic.btn_Servo.setStyleSheet("""
-            QPushButton {
-                background-color: #2ecc71;
-                color: black;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #27ae60;
-            }
-            QPushButton:pressed {
-                background-color: #1abc9c;
-            }
-        """)
+    def device_io_status(self):
+        if not self.DEVICE_IO:
+            self.DEVICE_IO = True
+
+            # Camera
+            self.camera = CameraThread()
+            self.camera.image.connect(self.update_frame)
+
+            # Serial
+            self.serial = SerialProcess()
+            self.serial.message.connect(self.update_serial)
+            self.method = 0
+
+            self.uic.btn_Device_IO.setStyleSheet(""" 
+                QPushButton {
+                    background-color: #2ecc71;
+                    color: black;
+                    font-size: 20px;
+                }""")
+        else:
+            self.DEVICE_IO = False
+            self.uic.btn_Device_IO.setStyleSheet(""" 
+                QPushButton {
+                    background-color: #c0392b;
+                    color: black;
+                    font-size: 20px;
+                }""")
 
     def con_dis_robot_action(self):
-        if self.uic.btn_Connect_Disconnect.text() == "Connect":
-            self.uic.btn_Connect_Disconnect.setText("Disconnect")
+        if not self.DEVICE_ROBOT:
+            return
+
+        if self.uic.btn_Robot_ConDis.text() == "Connect":
+            self.uic.btn_Robot_ConDis.setText("Disconnect")
 
             # Lấy dữ liệu IP và Port
             IP = self.uic.txt_IP.text()
@@ -252,16 +253,17 @@ class MainWindow(QMainWindow):
             self.socket.robot_address(IP, Port)
             self.socket.status = 0
             self.socket.start()
-            # self.conveyor.start()
             self.uic.lb_Connect_Disconnect.setText("Connected")
 
-        elif self.uic.btn_Connect_Disconnect.text() == "Disconnect":
-            self.uic.btn_Connect_Disconnect.setText("Connect")
+        elif self.uic.btn_Robot_ConDis.text() == "Disconnect":
+            self.uic.btn_Robot_ConDis.setText("Connect")
             self.socket.disconnect()
-            # self.conveyor.disconnect()
             self.uic.lb_Connect_Disconnect.setText("Disconnected")
 
     def con_dis_serial_action(self):
+        if not self.DEVICE_IO:
+            return
+
         if self.uic.btn_Serial_ConDis.text() == "Connect":
             self.uic.btn_Serial_ConDis.setText("Disconnect")
             Port = self.uic.txt_Port_.text()
@@ -278,12 +280,17 @@ class MainWindow(QMainWindow):
     def mode_auto(self):
         self.flag_Auto = True
         self.flag_Manual = False
+        self.uic.lb_Mode_Value.setText("AUTO")
 
     def mode_manual(self):
         self.flag_Auto = False
         self.flag_Manual = True
+        self.uic.lb_Mode_Value.setText("MANUAL")
 
     def open_close_action(self):
+        if not self.DEVICE_IO:
+            return
+
         self.camera.flag_Detect_YOLO = False
         self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
         self.camera.flag_Detect_COLOR = False
@@ -374,6 +381,12 @@ class MainWindow(QMainWindow):
         return True
 
     def servo_action(self):
+        if not self.DEVICE_ROBOT or not self.DEVICE_IO:
+            return
+
+        if self.uic.lb_Mode_Value.text() == "NONE":
+            return
+
         Data = None
         Data_Part = bytes([0x04, 0x00])
         Request_ID = bytes([0x01])
@@ -395,6 +408,7 @@ class MainWindow(QMainWindow):
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
                     self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4)
+                    self.set_double_action(self.uic.slider_Spe_Auto.value(), 0)
                     self.set_byte_action(0, 1)
                     self.set_byte_action(0, 2)
                     self.set_byte_action(0, 3)
@@ -490,10 +504,183 @@ class MainWindow(QMainWindow):
         self.socket.send_function(frame)
         self.socket.received_function()
 
+    def job_select_function(self, Data_Part, Data):
+        Data_Part = Data_Part.to_bytes(2, byteorder='little', signed=True)
+        Request_ID = bytes([0x03])
+        Command = bytes([0x87, 0x00])
+        Instance = bytes([0x01, 0x00])
+        Attribute = bytes([0x01])
+        Service = bytes([0x02])
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        self.socket.received_function()
+
+        return True
+
+    def start_job_function(self):
+        Data_Part = bytes([0x04, 0x00])
+        Request_ID = bytes([0x04])
+        Command = bytes([0x86, 0x00])
+        Instance = bytes([0x01, 0x00])
+        Attribute = bytes([0x01])
+        Service = bytes([0x10])
+        Data = bytes([0x01, 0x00, 0x00, 0x00])
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        self.socket.received_function()
+
+    def get_position_action(self):
+        Instance = None
+        # Khi đọc vị trí thành phần Data trong Request là không có (0x00 0x00 0x00 0x00)
+        # Khi đọc vị trí robot kiểu Pulse thì Instance = 1 (0x01 0x00)
+        # Khi đọc vị trí robot kiểu Cartesian thì Instance = 101 (0x65 0x00)
+        Data_Part = bytes([0x04, 0x00])
+        Request_ID = bytes([0xFA])
+        Command = bytes([0x75, 0x00])
+        Attribute = bytes([0x00])
+        Service = bytes([0x01])
+        Data = bytes([0x00, 0x00, 0x00, 0x00])
+
+        status = 0
+
+        while status < 2:
+            if status == 0:
+                Instance = bytes([0x01, 0x00])
+
+            elif status == 1:
+                Instance = bytes([0x65, 0x00])
+
+            frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+            self.socket.send_function(frame)
+            frame_data = self.socket.received_function()
+
+            first_axis = frame_data[52:56]
+            first_axis_value = int.from_bytes(first_axis, byteorder='little', signed=True)
+            second_axis = frame_data[56:60]
+            second_axis_value = int.from_bytes(second_axis, byteorder='little', signed=True)
+            third_axis = frame_data[60:64]
+            third_axis_value = int.from_bytes(third_axis, byteorder='little', signed=True)
+            fourth_axis = frame_data[64:68]
+            fourth_axis_value = int.from_bytes(fourth_axis, byteorder='little', signed=True)
+            fifth_axis = frame_data[68:72]
+            fifth_axis_value = int.from_bytes(fifth_axis, byteorder='little', signed=True)
+            sixth_axis = frame_data[72:76]
+            sixth_axis_value = int.from_bytes(sixth_axis, byteorder='little', signed=True)
+
+            if status == 0:
+                self.uic.txt_S.setText(str(int(first_axis_value * 30 / 34816)))
+                self.uic.txt_L.setText(str(int(second_axis_value * 90 / 102400)))
+                self.uic.txt_U.setText(str(int(third_axis_value * 90 / 51200)))
+                self.uic.txt_R.setText(str(int(fourth_axis_value * 30 / 10204)))
+                self.uic.txt_B.setText(str(int(fifth_axis_value * 30 / 10204)))
+                self.uic.txt_T.setText(str(int(sixth_axis_value * 30 / 10204)))
+            elif status == 1:
+                self.uic.txt_X.setText(str((first_axis_value / 1000)))
+                self.uic.txt_Y.setText(str((second_axis_value / 1000)))
+                self.uic.txt_Z.setText(str((third_axis_value / 1000)))
+                self.uic.txt_Roll.setText(str((fourth_axis_value / 10000)))
+                self.uic.txt_Pitch.setText(str((fifth_axis_value / 10000)))
+                self.uic.txt_Yaw.setText(str((sixth_axis_value / 10000)))
+
+            status += 1
+
+    def set_position_action(self, X, Y, Z, Roll, Pitch, Yaw, Ins):
+        Data_Part = bytes([0x2C, 0x00])
+        Request_ID = bytes([0xFB])
+        Command = bytes([0x7F, 0x00])
+        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+        Attribute = bytes([0x00])
+        Service = bytes([0x02])
+
+        Data_type = bytes([0x11, 0x00, 0x00, 0x00])
+        Data_temp_1 = bytes([0x00, 0x00, 0x00, 0x00,
+                             0x00, 0x00, 0x00, 0x00,
+                             0x00, 0x00, 0x00, 0x00,
+                             0x00, 0x00, 0x00, 0x00])
+        Data_X = X.to_bytes(4, byteorder='little', signed=True)
+        Data_Y = Y.to_bytes(4, byteorder='little', signed=True)
+        Data_Z = Z.to_bytes(4, byteorder='little', signed=True)
+        Data_Roll = Roll.to_bytes(4, byteorder='little', signed=True)
+        Data_Pitch = Pitch.to_bytes(4, byteorder='little', signed=True)
+        Data_Yaw = Yaw.to_bytes(4, byteorder='little', signed=True)
+
+        Data = []
+
+        Data.extend(Data_type)
+        Data.extend(Data_temp_1)
+        Data.extend(Data_X)
+        Data.extend(Data_Y)
+        Data.extend(Data_Z)
+        Data.extend(Data_Roll)
+        Data.extend(Data_Pitch)
+        Data.extend(Data_Yaw)
+
+        Data = bytes(Data)
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        self.socket.received_function()
+
+    def get_byte_action(self, Ins):
+        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
+        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
+        Data_Part = bytes([0x01, 0x00])
+        Request_ID = bytes([0xFC])
+        Command = bytes([0x7A, 0x00])
+        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+        Attribute = bytes([0x01])
+        Service = bytes([0x01])
+        Data = bytes([0x00])
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        frame_data = self.socket.received_function()
+
+        value = frame_data[32]
+
+        return value
+
+    def set_byte_action(self, Data, Ins):
+        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
+        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
+        Data_Part = bytes([0x01, 0x00])
+        Request_ID = bytes([0xFD])
+        Command = bytes([0x7A, 0x00])
+        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+        Attribute = bytes([0x01])
+        Service = bytes([0x02])
+        Data = Data.to_bytes(1, byteorder='little', signed=True)
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        self.socket.received_function()
+
+    def set_double_action(self, Data, Ins):
+        Data_Part = bytes([0x04, 0x00])
+        Request_ID = bytes([0xFE])
+        Command = bytes([0x7C, 0x00])
+        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+        Attribute = bytes([0x01])
+        Service = bytes([0x02])
+        Data = Data.to_bytes(4, byteorder='little', signed=True)
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        self.socket.received_function()
+
     def go_home_action(self):
         X_ = 185 * 1000
         Y_ = 0
-        Z_ = 35 * 1000
+        Z_ = 25 * 1000
         Roll_ = 180 * 10000
         Pitch_ = 0
         Yaw_ = 0
@@ -720,6 +907,10 @@ class MainWindow(QMainWindow):
         value = self.uic.slider_Spe_deg.value()
         self.uic.txt2_Spe_Value.setText(str(value))
 
+    def update_txt_Spe_Auto(self):
+        value = self.uic.slider_Spe_Auto.value()
+        self.uic.txt_Spe_Auto.setText(str(value))
+
     def update_txt_Pulse(self):
         Value = self.uic.txt_Pulse.text()
         self.serial_process_action(Value)
@@ -799,36 +990,10 @@ class MainWindow(QMainWindow):
             self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
             self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
 
-    def job_select_function(self, Data_Part, Data):
-        Data_Part = Data_Part.to_bytes(2, byteorder='little', signed=True)
-        Request_ID = bytes([0xFF])
-        Command = bytes([0x87, 0x00])
-        Instance = bytes([0x01, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
-
-        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-        self.socket.send_function(frame)
-        self.socket.received_function()
-
-        return True
-
-    def start_job_function(self):
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0xFE])
-        Command = bytes([0x86, 0x00])
-        Instance = bytes([0x01, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x10])
-        Data = bytes([0x01, 0x00, 0x00, 0x00])
-
-        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-        self.socket.send_function(frame)
-        self.socket.received_function()
-
     def move_job_action(self):
+        if not self.DEVICE_ROBOT or not self.DEVICE_IO:
+            return
+
         if self.uic.btn_Move_Job.text() == "MOVE JOB":
             ret = self.job_select_function(7, b'MOVEJOB')
             if ret:
@@ -860,6 +1025,9 @@ class MainWindow(QMainWindow):
                 self.uic.btn_Move_Job.setText("RUN JOB")
 
     def exit_job_action(self):
+        if not self.DEVICE_ROBOT or not self.DEVICE_IO:
+            return
+
         if self.uic.btn_Move_Job.text() == "RUNNING":
             self.uic.btn_Move_Job.setText("MOVE JOB")
         elif self.uic.btn_Move_Job.text() == "RUN JOB":
@@ -871,139 +1039,12 @@ class MainWindow(QMainWindow):
         self.set_byte_action(0, 1)
         self.set_byte_action(0, 2)
         self.set_byte_action(0, 3)
-        # self.go_home_action()
-
-    def set_byte_action(self, Data, Ins):
-        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
-        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
-        Data_Part = bytes([0x01, 0x00])
-        Request_ID = bytes([0xFD])
-        Command = bytes([0x7A, 0x00])
-        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
-        Data = Data.to_bytes(1, byteorder='little', signed=True)
-
-        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-        self.socket.send_function(frame)
-        self.socket.received_function()
-
-    def get_byte_action(self, Ins):
-        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
-        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
-        Data_Part = bytes([0x01, 0x00])
-        Request_ID = bytes([0xFC])
-        Command = bytes([0x7A, 0x00])
-        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x01])
-        Service = bytes([0x01])
-        Data = bytes([0x00])
-
-        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-        self.socket.send_function(frame)
-        frame_data = self.socket.received_function()
-
-        value = frame_data[32]
-
-        return value
-
-    def set_position_action(self, X, Y, Z, Roll, Pitch, Yaw, Ins):
-        Data_Part = bytes([0x2C, 0x00])
-        Request_ID = bytes([0xFB])
-        Command = bytes([0x7F, 0x00])
-        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x00])
-        Service = bytes([0x02])
-
-        Data_type = bytes([0x11, 0x00, 0x00, 0x00])
-        Data_temp_1 = bytes([0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00])
-        Data_X = X.to_bytes(4, byteorder='little', signed=True)
-        Data_Y = Y.to_bytes(4, byteorder='little', signed=True)
-        Data_Z = Z.to_bytes(4, byteorder='little', signed=True)
-        Data_Roll = Roll.to_bytes(4, byteorder='little', signed=True)
-        Data_Pitch = Pitch.to_bytes(4, byteorder='little', signed=True)
-        Data_Yaw = Yaw.to_bytes(4, byteorder='little', signed=True)
-
-        Data = []
-
-        Data.extend(Data_type)
-        Data.extend(Data_temp_1)
-        Data.extend(Data_X)
-        Data.extend(Data_Y)
-        Data.extend(Data_Z)
-        Data.extend(Data_Roll)
-        Data.extend(Data_Pitch)
-        Data.extend(Data_Yaw)
-
-        Data = bytes(Data)
-
-        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-        self.socket.send_function(frame)
-        self.socket.received_function()
-
-    def get_position_action(self):
-        Instance = None
-        # Khi đọc vị trí thành phần Data trong Request là không có (0x00 0x00 0x00 0x00)
-        # Khi đọc vị trí robot kiểu Pulse thì Instance = 1 (0x01 0x00)
-        # Khi đọc vị trí robot kiểu Cartesian thì Instance = 101 (0x65 0x00)
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0xFA])
-        Command = bytes([0x75, 0x00])
-        Attribute = bytes([0x00])
-        Service = bytes([0x01])
-        Data = bytes([0x00, 0x00, 0x00, 0x00])
-
-        status = 0
-
-        while status < 2:
-            if status == 0:
-                Instance = bytes([0x01, 0x00])
-
-            elif status == 1:
-                Instance = bytes([0x65, 0x00])
-
-            frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
-
-            self.socket.send_function(frame)
-            frame_data = self.socket.received_function()
-
-            first_axis = frame_data[52:56]
-            first_axis_value = int.from_bytes(first_axis, byteorder='little', signed=True)
-            second_axis = frame_data[56:60]
-            second_axis_value = int.from_bytes(second_axis, byteorder='little', signed=True)
-            third_axis = frame_data[60:64]
-            third_axis_value = int.from_bytes(third_axis, byteorder='little', signed=True)
-            fourth_axis = frame_data[64:68]
-            fourth_axis_value = int.from_bytes(fourth_axis, byteorder='little', signed=True)
-            fifth_axis = frame_data[68:72]
-            fifth_axis_value = int.from_bytes(fifth_axis, byteorder='little', signed=True)
-            sixth_axis = frame_data[72:76]
-            sixth_axis_value = int.from_bytes(sixth_axis, byteorder='little', signed=True)
-
-            if status == 0:
-                self.uic.txt_S.setText(str(int(first_axis_value * 30 / 34816)))
-                self.uic.txt_L.setText(str(int(second_axis_value * 90 / 102400)))
-                self.uic.txt_U.setText(str(int(third_axis_value * 90 / 51200)))
-                self.uic.txt_R.setText(str(int(fourth_axis_value * 30 / 10204)))
-                self.uic.txt_B.setText(str(int(fifth_axis_value * 30 / 10204)))
-                self.uic.txt_T.setText(str(int(sixth_axis_value * 30 / 10204)))
-            elif status == 1:
-                self.uic.txt_X.setText(str((first_axis_value / 1000)))
-                self.uic.txt_Y.setText(str((second_axis_value / 1000)))
-                self.uic.txt_Z.setText(str((third_axis_value / 1000)))
-                self.uic.txt_Roll.setText(str((fourth_axis_value / 10000)))
-                self.uic.txt_Pitch.setText(str((fifth_axis_value / 10000)))
-                self.uic.txt_Yaw.setText(str((sixth_axis_value / 10000)))
-
-            status += 1
+        self.go_home_action()
 
     def serial_process_action(self, Pulse):
+        if not self.DEVICE_IO:
+            return
+
         Data = []
         STX = bytes([0x02])
         ACK = bytes([0x00])
@@ -1023,37 +1064,10 @@ class MainWindow(QMainWindow):
 
         self.serial.sendSerial(Data)
 
-    def start_time(self):
-        self.run_time = time.time()
-
-    def stop_time(self):
-        self.end_time = time.time()
-        self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
-
-    def pos_pick_action(self):
-        self.flag_Enable_Job = True
-        print("X = " + str(self.X_))
-        print("Y = " + str(self.Y_))
-        print("Z = " + str(self.Z_))
-        print("Roll = " + str(self.Roll_))
-        print("Pitch = " + str(self.Pitch_))
-        print("Yaw = " + str(self.Yaw_))
-
-    def move_test_action(self):
-        X_ = self.X_
-        Y_ = self.Y_
-        Z_ = self.Z_
-        Roll_ = self.Roll_
-        Pitch_ = self.Pitch_
-        Yaw_ = self.Yaw_
-
-        self.move_command_action(0, int(X_), int(Y_), 35000,
-                                 int(Roll_), int(Pitch_), int(Yaw_))
-        time.sleep(3)
-        self.move_command_action(0, int(X_), int(Y_), int(Z_),
-                                 int(Roll_), int(Pitch_), int(Yaw_))
-
     def update_frame(self, obj_detect, flag_last_id, color_frame, binary_frame, depth_frame, point_u, point_v, angle):
+        if not self.DEVICE_ROBOT or not self.DEVICE_IO:
+            return
+
         print("Status detect: " + str(flag_last_id))
         print("u = " + str(point_u))
         print("v = " + str(point_v))
@@ -1096,31 +1110,6 @@ class MainWindow(QMainWindow):
                 cv2.imwrite(os.path.join(save_path_object, object_file_name), color_frame)
                 self.flag_Capture_Object = False
                 self.uic.lb_Index.setText("Image_(" + str(self.index_data) + ")")
-
-            # if self.flag_Conveyor:
-            #     if (point_u != 0) & (point_v != 0):
-            #         Xc, Yc, Zc, depth_value = self.camera.point(point_u, point_v)
-            #
-            #         Wc = np.array([[Xc],
-            #                        [Yc],
-            #                        [Zc],
-            #                        [1.0]])
-            #         Wr = self.T_cam2base.dot(Wc)
-            #
-            #         self.X_ = Wr[0][0] * 1000 + 5000
-            #         self.Y_ = Wr[1][0] * 1000 + (-(Wr[1][0] * 1000)) - 50000
-            #         self.Z_ = Wr[2][0] * 1000
-            #         self.Roll_ = 180 * 10000
-            #         self.Pitch_ = 0 * 10000
-            #         self.Yaw_ = int(angle * 10000)
-            #
-            #         if obj_detect:
-            #             print("\n\nX = " + str(self.X_) + '\n' +
-            #                   "Y = " + str(self.Y_) + '\n' +
-            #                   "Z = " + str(self.Z_) + '\n' +
-            #                   "Roll = " + str(self.Roll_) + '\n' +
-            #                   "Pitch = " + str(self.Pitch_) + '\n' +
-            #                   "Yaw = " + str(self.Yaw_))
 
             if self.flag_Detect_ArUco:
                 frame, rve, tve, _, u, v = ArUcoDetection.ARUCO_Detection(frame, self.Int_matrix, self.detector, 65)
@@ -1251,39 +1240,44 @@ class MainWindow(QMainWindow):
 
     def update_timer(self):
         if self.flag_Select:
-            self.get_position_action()
+            if self.DEVICE_ROBOT:
+                self.get_position_action()
             self.flag_Select = False
 
         elif not self.flag_Select:
-            if self.flag_Enable_Job:
-                status = self.get_byte_action(5)
-                self.uic.txt_Status.setText("Byte 5 = " + str(status))
-                if status == 0:
-                    self.flag_Process = False
-                    self.uic.lb_Gripper.setText("Gripper: None")
-                elif status == 1:
-                    if self.flag_Auto:
-                        self.flag_Process = True
-                    else:
+            if self.DEVICE_IO:
+                if self.flag_Enable_Job:
+                    status = self.get_byte_action(5)
+                    self.uic.txt_Status.setText("Byte 5 = " + str(status))
+                    if status == 0:
                         self.flag_Process = False
-                elif status == 2:
-                    self.uic.lb_Gripper.setText("Gripper: Pick")
-                    self.method = 4
-                    self.serial_process_action(30)
-                    self.set_byte_action(0, 5)
-                    self.timer.stop()
-                elif status == 3:
-                    self.uic.lb_Gripper.setText("Gripper: Place")
-                    self.method = 5
+                        self.uic.lb_Gripper.setText("Gripper: None")
+                    elif status == 1:
+                        if self.flag_Auto:
+                            self.flag_Process = True
+                        else:
+                            self.flag_Process = False
+                    elif status == 2:
+                        self.uic.lb_Gripper.setText("Gripper: Pick")
+                        self.method = 4
+                        self.serial_process_action(30)
+                        self.set_byte_action(0, 5)
+                        self.timer.stop()
+                    elif status == 3:
+                        self.uic.lb_Gripper.setText("Gripper: Place")
+                        self.method = 5
+                        self.serial_process_action(80)
+                        self.set_byte_action(0, 5)
+                        self.timer.stop()
+                else:
+                    self.method = 0
                     self.serial_process_action(80)
-                    self.set_byte_action(0, 5)
-                    self.timer.stop()
-            else:
-                self.method = 0
-                self.serial_process_action(80)
             self.flag_Select = True
 
     def update_serial(self, Data_received):
+        if not self.DEVICE_IO:
+            return
+
         # self.uic.txt_Received.setText(str(Data_received))
         Service = Data_received[9]
         if Service == b'\x04':
@@ -1296,48 +1290,41 @@ class MainWindow(QMainWindow):
             self.timer.start(50)
         self.method = 0
 
-    # def update_mode(self):
-    #     self.Mode_Control = self.uic.cBox_Mode.currentText()
-    #     print("Mode control: " + self.Mode_Control)
+    # TEST FUNCTION OF PROJECT
+    def pos_pick_clicked(self):
+        self.flag_Enable_Job = True
+        print("X = " + str(self.X_))
+        print("Y = " + str(self.Y_))
+        print("Z = " + str(self.Z_))
+        print("Roll = " + str(self.Roll_))
+        print("Pitch = " + str(self.Pitch_))
+        print("Yaw = " + str(self.Yaw_))
 
-    # def conveyor_action(self):
-    #     if self.uic.btn_Conveyor.text() == "Conveyor ON":
-    #         self.conveyor.send_function(bytes([0x01]))
-    #         # frame = bytes([0x11,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00, 0x00, 0x00,
-    #         #                0x00, 0x08,
-    #         #                0x20,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x01])
-    #         # self.conveyor.send_function(frame)
-    #         # self.conveyor.received_function()
-    #         self.uic.btn_Conveyor.setText("Conveyor OFF")
-    #     elif self.uic.btn_Conveyor.text() == "Conveyor OFF":
-    #         # frame = bytes([0x11,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00, 0x00, 0x00,
-    #         #                0x00, 0x08,
-    #         #                0x20,
-    #         #                0x00,
-    #         #                0x00,
-    #         #                0x00, 0x00,
-    #         #                0x00, 0x00])
-    #         # self.conveyor.send_function(frame)
-    #         # self.conveyor.received_function()
-    #         self.uic.btn_Conveyor.setText("Conveyor ON")
+    def move_test_clicked(self):
+        X_ = self.X_
+        Y_ = self.Y_
+        Z_ = self.Z_
+        Roll_ = self.Roll_
+        Pitch_ = self.Pitch_
+        Yaw_ = self.Yaw_
+
+        self.move_command_action(0, int(X_), int(Y_), 35000,
+                                 int(Roll_), int(Pitch_), int(Yaw_))
+        time.sleep(3)
+        self.move_command_action(0, int(X_), int(Y_), int(Z_),
+                                 int(Roll_), int(Pitch_), int(Yaw_))
+
+    def test_job_clicked(self):
+        ret = self.job_select_function(7, b'MOVEJOB')
+        if ret:
+            self.start_job_function()
+
+    def start_time(self):
+        self.run_time = time.time()
+
+    def stop_time(self):
+        self.end_time = time.time()
+        self.uic.txt_dt.setText(str(round((self.end_time - self.run_time), 2)))
 
 
 class RobotSocket(QThread):
@@ -1629,49 +1616,6 @@ class SerialProcess(QThread):
     def sendSerial(self, Data):
         print(str(Data))
         self.serialPort.write(Data)
-
-
-# class ConveyorSocket(QThread):
-#     def __init__(self):
-#         super(ConveyorSocket, self).__init__()
-#         self.IP = '192.168.1.1'
-#         self.Port = 10001
-#
-#         # SOCK_STREAM là dùng để truyền thông bằng giao thức TCP
-#         # SOCK_DGRAM là dùng để truyền thông bằng giao thức UDP
-#         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         # self.client = ModbusTcpClient(self.IP, port=self.Port)
-#         print("Conveyor Socket Finished Init")
-#
-#     def run(self):
-#         # Thiết lập kết nối
-#         try:
-#             self.s.connect((self.IP, self.Port))
-#             # self.client.connect()
-#             print("IP: " + self.IP + '\n' + "Port: " + str(self.Port))
-#         except Exception as e:
-#             print("Error:", e)
-#
-#     def disconnect(self):
-#         if self.s:
-#             self.s.close()
-#             print("Status Conveyor Disconnected")
-#             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         # print("Status Conveyor Disconnected")
-#
-#     def send_function(self, data):
-#         self.s.sendto(data, (self.IP, self.Port))
-#         print("Data Send: " + str(data))
-#         # response = self.client.write_register(0, 1, (self.IP, self.Port))
-#         # print(str(response))
-#         # if response.isError():
-#         #     print("Error:", response)
-#         # else:
-#         #     print("Successfully")
-#
-#     def received_function(self):
-#         frame_data, _ = self.s.recvfrom(4096)
-#         print("Data Received: " + str(frame_data) + '\n')
 
 
 if __name__ == "__main__":
