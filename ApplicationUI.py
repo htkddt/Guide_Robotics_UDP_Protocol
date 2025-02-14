@@ -14,13 +14,20 @@ class MainWindowUI(object):
         mainWindow.resize(1520, 900)
         mainWindow.setWindowTitle("Robot Application")
 
+        self.initConnectionGroup(mainWindow)
+        self.initBasicControlGroup(mainWindow)
+        self.initIncrementalControlGroup(mainWindow)
+        self.initGetPositionGroup(mainWindow)
+        self.initJobControlGroup(mainWindow)
+        self.initCameraGroup(mainWindow)
+
+    def initConnectionGroup(self, mw):
         fontBold = QFont("Time New Roman", 8)
         fontBold.setBold(True)
         fontRegular = QFont("Time New Roman", 8)
         fontRegular.setBold(False)
 
-        # Group Connection
-        grConnection = QGroupBox(mainWindow)
+        grConnection = QGroupBox(mw)
         grConnection.setTitle("CONNECTION")
         grConnection.setFont(fontBold)
         grConnection.setGeometry(30, 10, 561, 251)
@@ -29,7 +36,7 @@ class MainWindowUI(object):
         grRobot = QGroupBox(grConnection)
         grRobot.setTitle("ROBOT")
         grRobot.setFont(fontBold)
-        grRobot.setGeometry(20, 20, 251, 171)
+        grRobot.setGeometry(20, 20, 251, 221)
 
         self.lbIPRobot = QLabel(grRobot)
         self.lbIPRobot.setFont(fontRegular)
@@ -54,11 +61,41 @@ class MainWindowUI(object):
         self.btnRobotConDis = QPushButton(grRobot)
         self.btnRobotConDis.setGeometry(10, 90, 231, 41)
 
+        self.lbDeviceRobotStatus = QLabel(grRobot)
+        self.lbDeviceRobotStatus.setFont(fontRegular)
+        self.lbDeviceRobotStatus.setAlignment(Qt.AlignLeft)
+        self.lbDeviceRobotStatus.setGeometry(10, 150, 131, 20)
+
+        self.btnDeviceRobotBackground = QPushButton(grRobot)
+        self.btnDeviceRobotBackground.setGeometry(150, 142, 60, 30)
+        self.btnDeviceRobotBackground.setStyleSheet(""" 
+            QPushButton {
+                background-color: lightgray;
+                border-radius: 15px;
+            }""")
+        self.btnDeviceRobotCircle = QPushButton(self.btnDeviceRobotBackground)
+        self.btnDeviceRobotCircle.setGeometry(0, 0, 26, 30)
+        self.btnDeviceRobotCircle.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                border-radius: 13px;
+            }""")
+
+        self.lbRobotConnectStatus = QLabel(grRobot)
+        self.lbRobotConnectStatus.setFont(fontRegular)
+        self.lbRobotConnectStatus.setAlignment(Qt.AlignLeft)
+        self.lbRobotConnectStatus.setGeometry(10, 190, 131, 20)
+
+        self.txtRobotConnectStatus = QLabel(grRobot)
+        self.txtRobotConnectStatus.setFont(fontBold)
+        self.txtRobotConnectStatus.setAlignment(Qt.AlignLeft)
+        self.txtRobotConnectStatus.setGeometry(150, 190, 81, 20)
+
         # Group Gripper inside Group Connection
         grGripper = QGroupBox(grConnection)
         grGripper.setTitle("GRIPPER")
         grGripper.setFont(fontBold)
-        grGripper.setGeometry(290, 20, 251, 171)
+        grGripper.setGeometry(290, 20, 251, 221)
 
         self.lbPortGripper = QLabel(grGripper)
         self.lbPortGripper.setFont(fontRegular)
@@ -83,32 +120,87 @@ class MainWindowUI(object):
         self.btnGripperConDis = QPushButton(grGripper)
         self.btnGripperConDis.setGeometry(10, 90, 231, 41)
 
-        # Group Basic Control
-        grBasicControl = QGroupBox(mainWindow)
+        self.lbDeviceIOStatus = QLabel(grGripper)
+        self.lbDeviceIOStatus.setFont(fontRegular)
+        self.lbDeviceIOStatus.setAlignment(Qt.AlignLeft)
+        self.lbDeviceIOStatus.setGeometry(10, 150, 131, 20)
+
+        self.btnDeviceIOBackground = QPushButton(grGripper)
+        self.btnDeviceIOBackground.setGeometry(150, 142, 60, 30)
+        self.btnDeviceIOBackground.setStyleSheet(""" 
+                    QPushButton {
+                        background-color: lightgray;
+                        border-radius: 15px;
+                    }""")
+        self.btnDeviceIOCircle = QPushButton(self.btnDeviceIOBackground)
+        self.btnDeviceIOCircle.setGeometry(0, 0, 26, 30)
+        self.btnDeviceIOCircle.setStyleSheet("""
+                    QPushButton {
+                        background-color: white;
+                        border-radius: 13px;
+                    }""")
+
+        self.lbIOConnectStatus = QLabel(grGripper)
+        self.lbIOConnectStatus.setFont(fontRegular)
+        self.lbIOConnectStatus.setAlignment(Qt.AlignLeft)
+        self.lbIOConnectStatus.setGeometry(10, 190, 131, 20)
+
+        self.txtIOConnectStatus = QLabel(grGripper)
+        self.txtIOConnectStatus.setFont(fontBold)
+        self.txtIOConnectStatus.setAlignment(Qt.AlignLeft)
+        self.txtIOConnectStatus.setGeometry(150, 190, 81, 20)
+
+    def initBasicControlGroup(self, mw):
+        fontBold = QFont("Time New Roman", 8)
+        fontBold.setBold(True)
+        fontRegular = QFont("Time New Roman", 8)
+        fontRegular.setBold(False)
+
+        grBasicControl = QGroupBox(mw)
         grBasicControl.setTitle("BASIC CONTROL")
         grBasicControl.setFont(fontBold)
         grBasicControl.setGeometry(30, 280, 561, 131)
 
-        # Group Incremental Position
-        grIncremental = QGroupBox(mainWindow)
+    def initIncrementalControlGroup(self, mw):
+        fontBold = QFont("Time New Roman", 8)
+        fontBold.setBold(True)
+        fontRegular = QFont("Time New Roman", 8)
+        fontRegular.setBold(False)
+
+        grIncremental = QGroupBox(mw)
         grIncremental.setTitle("INCREMENTAL POSITION")
         grIncremental.setFont(fontBold)
         grIncremental.setGeometry(30, 430, 561, 421)
 
-        # Group Get Position
-        grGetPosition = QGroupBox(mainWindow)
+    def initGetPositionGroup(self, mw):
+        fontBold = QFont("Time New Roman", 8)
+        fontBold.setBold(True)
+        fontRegular = QFont("Time New Roman", 8)
+        fontRegular.setBold(False)
+
+        grGetPosition = QGroupBox(mw)
         grGetPosition.setTitle("GET POSITION")
         grGetPosition.setFont(fontBold)
         grGetPosition.setGeometry(610, 10, 481, 301)
 
-        # Group Job Control
-        grJobControl = QGroupBox(mainWindow)
+    def initJobControlGroup(self, mw):
+        fontBold = QFont("Time New Roman", 8)
+        fontBold.setBold(True)
+        fontRegular = QFont("Time New Roman", 8)
+        fontRegular.setBold(False)
+
+        grJobControl = QGroupBox(mw)
         grJobControl.setTitle("JOB CONTROL")
         grJobControl.setFont(fontBold)
         grJobControl.setGeometry(1110, 10, 371, 301)
 
-        # Group Camera
-        grCamera = QGroupBox(mainWindow)
+    def initCameraGroup(self, mw):
+        fontBold = QFont("Time New Roman", 8)
+        fontBold.setBold(True)
+        fontRegular = QFont("Time New Roman", 8)
+        fontRegular.setBold(False)
+
+        grCamera = QGroupBox(mw)
         grCamera.setTitle("CAMERA")
         grCamera.setFont(fontBold)
         grCamera.setGeometry(610, 320, 871, 531)
@@ -128,6 +220,10 @@ class MainWindowUI(object):
         self.btnRobotConDis.setFont(fontBold)
         self.btnRobotConDis.setText("Connect")
 
+        self.lbDeviceRobotStatus.setText("Device Robot Status:")
+        self.lbRobotConnectStatus.setText("Robot Connection Status:")
+        self.txtRobotConnectStatus.setText("Disconnected")
+
         # Group Gripper
         self.lbPortGripper.setText("Port")
         self.lbBaudGripper.setText("Baudrate")
@@ -136,6 +232,10 @@ class MainWindowUI(object):
 
         self.btnGripperConDis.setFont(fontBold)
         self.btnGripperConDis.setText("Connect")
+
+        self.lbDeviceIOStatus.setText("Device I/O Status:")
+        self.lbIOConnectStatus.setText("I/O Connection Status:")
+        self.txtIOConnectStatus.setText("Disconnected")
 
 
 if __name__ == "__main__":
