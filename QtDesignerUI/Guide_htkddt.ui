@@ -6,27 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1471</width>
-    <height>897</height>
+    <width>1520</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="btn_Depth">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>170</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Depth_frame</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="gr_Connection">
     <property name="geometry">
      <rect>
@@ -57,7 +44,7 @@
        <x>20</x>
        <y>20</y>
        <width>251</width>
-       <height>171</height>
+       <height>221</height>
       </rect>
      </property>
      <property name="title">
@@ -67,7 +54,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>140</y>
+        <y>190</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -138,8 +125,6 @@
       <property name="font">
        <font>
         <pointsize>9</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
        </font>
       </property>
       <property name="text">
@@ -179,7 +164,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>140</y>
+        <y>190</y>
         <width>51</width>
         <height>20</height>
        </rect>
@@ -200,6 +185,26 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QPushButton" name="btn_Device_Robot">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>231</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Device Robot Status</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="gr_Gripper">
      <property name="geometry">
@@ -207,7 +212,7 @@
        <x>290</x>
        <y>20</y>
        <width>251</width>
-       <height>171</height>
+       <height>221</height>
       </rect>
      </property>
      <property name="title">
@@ -217,7 +222,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>140</y>
+        <y>190</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -255,7 +260,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>140</y>
+        <y>190</y>
         <width>51</width>
         <height>20</height>
        </rect>
@@ -350,50 +355,30 @@
        <string>Baudrate</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QPushButton" name="btn_Device_Robot">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>200</y>
-       <width>251</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Device Robot Status</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_Device_IO">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>200</y>
-       <width>251</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Device I/O Status</string>
-     </property>
+     <widget class="QPushButton" name="btn_Device_IO">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>231</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Device I/O Status</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QGroupBox" name="gr_Get_Position">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>10</y>
       <width>481</width>
       <height>301</height>
@@ -1301,56 +1286,11 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="btn_Binary">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>120</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Binary_frame</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Display_frame">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>340</y>
-      <width>640</width>
-      <height>480</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_RGB">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>70</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RGB_frame</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="gr_Basic_Control">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>270</y>
+      <y>280</y>
       <width>561</width>
       <height>131</height>
      </rect>
@@ -1538,26 +1478,13 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="btn_Open_Close">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>20</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Open Camera</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="gr_Inc_Pos">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>410</y>
+      <y>430</y>
       <width>561</width>
-      <height>411</height>
+      <height>421</height>
      </rect>
     </property>
     <property name="font">
@@ -2275,189 +2202,13 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="btn_Capture_Aruco">
+   <widget class="QGroupBox" name="gr_Camera">
     <property name="geometry">
      <rect>
-      <x>1130</x>
-      <y>220</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Capture ArUco</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Exit_Job">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>70</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>EXIT JOB</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Capture_Object">
-    <property name="geometry">
-     <rect>
-      <x>1130</x>
-      <y>270</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Capture Object</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Aruco_Detect">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>220</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ArUco Detect ON</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_COLOR_Detect">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>170</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>COLOR Detect ON</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_YOLO_detect">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>120</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>YOLO Detect ON</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Move_Job">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>20</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>MOVE JOB</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Test_Job">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>270</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test Job</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lb_Gripper">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>380</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="lineWidth">
-     <number>0</number>
-    </property>
-    <property name="text">
-     <string>Gripper: Pick</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lb_Object">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>340</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="lineWidth">
-     <number>0</number>
-    </property>
-    <property name="text">
-     <string>Object: False</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lb_Index">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>580</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="lineWidth">
-     <number>0</number>
-    </property>
-    <property name="text">
-     <string>Image_(0)</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Background">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>780</y>
-      <width>111</width>
-      <height>41</height>
+      <x>610</x>
+      <y>320</y>
+      <width>871</width>
+      <height>531</height>
      </rect>
     </property>
     <property name="font">
@@ -2466,17 +2217,231 @@
       <bold>true</bold>
      </font>
     </property>
-    <property name="text">
-     <string>BACKGROUND</string>
+    <property name="title">
+     <string>CAMERA</string>
     </property>
+    <widget class="QLabel" name="Display_frame">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>30</y>
+       <width>640</width>
+       <height>480</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Capture_Object">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>280</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Capture Object</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Binary">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>130</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Binary_frame</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Capture_Aruco">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>230</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Capture ArUco</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_RGB">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>80</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>RGB_frame</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Depth">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>180</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Depth_frame</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Open_Close">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>30</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Open Camera</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Aruco_Detect">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>470</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>ArUco Detect ON</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_YOLO_detect">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>370</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>YOLO Detect ON</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_COLOR_Detect">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>420</y>
+       <width>151</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>COLOR Detect ON</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lb_Index">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>330</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="text">
+      <string>Image_(0)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="btn_Start">
+   <widget class="QGroupBox" name="gr_Job_Robot">
     <property name="geometry">
      <rect>
-      <x>1290</x>
-      <y>420</y>
-      <width>111</width>
-      <height>41</height>
+      <x>1110</x>
+      <y>10</y>
+      <width>371</width>
+      <height>301</height>
      </rect>
     </property>
     <property name="font">
@@ -2485,114 +2450,272 @@
       <bold>true</bold>
      </font>
     </property>
-    <property name="text">
-     <string>START TIME</string>
+    <property name="title">
+     <string>JOB CONTROL</string>
     </property>
+    <widget class="QPushButton" name="btn_Move_Job">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>MOVE JOB</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Exit_Job">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>240</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>EXIT JOB</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_dt">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Start">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Start Time</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Stop">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Stop Time</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_Status">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>140</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Pos_Pick">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>40</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Position Detect</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Move_Test">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>90</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Move Position</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lb_Gripper">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>90</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="text">
+      <string>Gripper: Pick</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lb_Object">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>40</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="text">
+      <string>Object: False</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Background">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>240</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>BACKGROUND</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Test_Job">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>140</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Run Test Job</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="btn_Stop">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>470</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>STOP TIME</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="txt_dt">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>520</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Pos_Pick">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>630</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>POSITION</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_Move_Test">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>680</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>MOVE</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="txt_Status">
-    <property name="geometry">
-     <rect>
-      <x>1290</x>
-      <y>730</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
+   <zorder>gr_Job_Robot</zorder>
+   <zorder>gr_Camera</zorder>
+   <zorder>gr_Connection</zorder>
+   <zorder>gr_Get_Position</zorder>
+   <zorder>gr_Basic_Control</zorder>
+   <zorder>gr_Inc_Pos</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1471</width>
+     <width>1520</width>
      <height>26</height>
     </rect>
    </property>

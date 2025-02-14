@@ -14,19 +14,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 from CameraSource.RealsenseCamera import *
 from ObjectProcess.YoloDetection import *
 from ObjectProcess.YoloSegmentation import *
-from ApplicationUI.Guide_htkddt import Ui_MainWindow
-
-"""
-# Khai báo MainWindow() loại 1
-class MainWindow():
-    def __int__(self):
-        self.main_win = QMainWindow()
-        self.uic = Ui_MainWindow()
-        self.uic.setupUi(self.main_win)
-
-    def show(self):
-        self.main_win.show()
-"""
+# from ApplicationUI import MainWindowUI
+from QtDesignerUI.Guide_htkddt import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):
@@ -35,11 +24,15 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # self.uic = MainWindowUI()
+        # self.uic.initUI(self)
+        # self.uic.initText()
+
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self)
 
         self.DEVICE_ROBOT = False
-        self.uic.btn_Device_Robot.setStyleSheet(""" 
+        self.uic.btn_Device_Robot.setStyleSheet("""
             QPushButton {
                 background-color: #c0392b;
                 color: black;
@@ -48,7 +41,7 @@ class MainWindow(QMainWindow):
         self.uic.btn_Device_Robot.clicked.connect(self.device_robot_status)
 
         self.DEVICE_IO = False
-        self.uic.btn_Device_IO.setStyleSheet(""" 
+        self.uic.btn_Device_IO.setStyleSheet("""
             QPushButton {
                 background-color: #c0392b;
                 color: black;
@@ -258,7 +251,7 @@ class MainWindow(QMainWindow):
         elif self.uic.btn_Robot_ConDis.text() == "Disconnect":
             self.uic.btn_Robot_ConDis.setText("Connect")
             self.socket.disconnect()
-            self.uic.lb_Connect_Disconnect.setText("Disconnected")
+            # self.uic.lb_Connect_Disconnect.setText("Disconnected") ADD SWITCH BUTTON
 
     def con_dis_serial_action(self):
         if not self.DEVICE_IO:
@@ -275,7 +268,7 @@ class MainWindow(QMainWindow):
         elif self.uic.btn_Serial_ConDis.text() == "Disconnect":
             self.uic.btn_Serial_ConDis.setText("Connect")
             self.serial.serial_disconnect()
-            self.uic.lb_Connect_Disconnect_.setText("Disconnected")
+            # self.uic.lb_Connect_Disconnect_.setText("Disconnected") ADD SWITCH BUTTON
 
     def mode_auto(self):
         self.flag_Auto = True
@@ -1620,6 +1613,6 @@ class SerialProcess(QThread):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    main_win = MainWindow()
-    main_win.show()
+    window = MainWindow()
+    window.show()
     sys.exit(app.exec())
