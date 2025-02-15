@@ -14,10 +14,10 @@ import numpy as np
 
 index_folder = 1
 
-gripper2base_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Gripper2base\\Data_({index_folder})'
+gripper2base_folder_path = f'D:\\A_Project\\PyCharm_Project\\CameraCalibration\\Value\\Gripper2base\\Data_({index_folder})'
 gripper2base_files = [f for f in os.listdir(gripper2base_folder_path) if f.endswith('.txt')]
 
-target2cam_folder_path = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Value\\Target2cam\\Data_({index_folder})'
+target2cam_folder_path = f'D:\\A_Project\\PyCharm_Project\\CameraCalibration\\Value\\Target2cam\\Data_({index_folder})'
 target2cam_files = [f for f in os.listdir(target2cam_folder_path) if f.endswith('.txt')]
 
 

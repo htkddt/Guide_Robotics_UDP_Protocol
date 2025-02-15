@@ -213,8 +213,8 @@ class MainWindow(QMainWindow):
             self.camera.image.connect(self.update_frame)
 
             # Serial
-            self.serial = SerialProcess()
-            self.serial.message.connect(self.update_serial)
+            # self.serial = SerialProcess()
+            # self.serial.message.connect(self.update_serial)
             self.method = 0
 
             self.uic.btn_Device_IO.setStyleSheet(""" 
@@ -251,7 +251,7 @@ class MainWindow(QMainWindow):
         elif self.uic.btn_Robot_ConDis.text() == "Disconnect":
             self.uic.btn_Robot_ConDis.setText("Connect")
             self.socket.disconnect()
-            # self.uic.lb_Connect_Disconnect.setText("Disconnected") ADD SWITCH BUTTON
+            self.uic.lb_Connect_Disconnect.setText("Disconnected") # ADD SWITCH BUTTON
 
     def con_dis_serial_action(self):
         if not self.DEVICE_IO:
@@ -268,7 +268,7 @@ class MainWindow(QMainWindow):
         elif self.uic.btn_Serial_ConDis.text() == "Disconnect":
             self.uic.btn_Serial_ConDis.setText("Connect")
             self.serial.serial_disconnect()
-            # self.uic.lb_Connect_Disconnect_.setText("Disconnected") ADD SWITCH BUTTON
+            self.uic.lb_Connect_Disconnect_.setText("Disconnected") # ADD SWITCH BUTTON
 
     def mode_auto(self):
         self.flag_Auto = True
@@ -374,7 +374,7 @@ class MainWindow(QMainWindow):
         return True
 
     def servo_action(self):
-        if not self.DEVICE_ROBOT or not self.DEVICE_IO:
+        if not self.DEVICE_ROBOT:
             return
 
         if self.uic.lb_Mode_Value.text() == "NONE":
@@ -407,7 +407,7 @@ class MainWindow(QMainWindow):
                     self.set_byte_action(0, 3)
                     self.set_byte_action(0, 4)
                     self.set_byte_action(1, 0)
-                    self.serial_process_action(80)
+                    # self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
             self.uic.btn_Servo.setText("Servo Off")
@@ -1253,18 +1253,18 @@ class MainWindow(QMainWindow):
                     elif status == 2:
                         self.uic.lb_Gripper.setText("Gripper: Pick")
                         self.method = 4
-                        self.serial_process_action(30)
+                        # self.serial_process_action(30)
                         self.set_byte_action(0, 5)
                         self.timer.stop()
                     elif status == 3:
                         self.uic.lb_Gripper.setText("Gripper: Place")
                         self.method = 5
-                        self.serial_process_action(80)
+                        # self.serial_process_action(80)
                         self.set_byte_action(0, 5)
                         self.timer.stop()
                 else:
                     self.method = 0
-                    self.serial_process_action(80)
+                    # self.serial_process_action(80)
             self.flag_Select = True
 
     def update_serial(self, Data_received):

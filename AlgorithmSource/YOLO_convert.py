@@ -4,13 +4,13 @@ from ObjectProcess.YoloDetection import *
 
 yoloDetect = YoloDetection()
 
-input_dir = 'D:\\A_Project\\PyCharm_Project\\Object_Segmentation\\tmp\\masks'
+input_dir = 'D:\\A_Project\\PyCharm_Project\\ObjectSegmentation\\tmp\\masks'
 input_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.png')]
 
-output_dir = 'D:\\A_Project\\PyCharm_Project\\Object_Segmentation\\tmp\\convert'
+output_dir = 'D:\\A_Project\\PyCharm_Project\\ObjectSegmentation\\tmp\\convert'
 
 for index in range(1, len(input_files) + 1):
-    image = f'D:\\A_Project\\PyCharm_Project\\Object_Segmentation\\tmp\\masks\\image_({index}).png'
+    image = f'D:\\A_Project\\PyCharm_Project\\ObjectSegmentation\\tmp\\masks\\image_({index}).png'
     frame = cv2.imread(image)
     cap, _, _, _, _, _, id_list = yoloDetect.getObject(frame)
     print(str(id_list))

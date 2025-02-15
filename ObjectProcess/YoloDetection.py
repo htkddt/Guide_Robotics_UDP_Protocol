@@ -15,13 +15,13 @@ class YoloDetection:
     def __init__(self):
         # Load model
         # train (epoch=20 và batch=2) Object_Detection_1
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train/weights/best.pt")
+        # self.model = YOLO("D:/A_Project/PyCharm_Project/ApplicationRobotics/runs/detect/train/weights/best.pt")
         # train2 (epoch=20 và batch=2) Object_Detection_1 (last.pt model train)
-        self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train2/weights/best.pt")
+        self.model = YOLO("D:/A_Project/PyCharm_Project/ApplicationRobotics/runs/detect/train2/weights/best.pt")
         # train3 (epoch=20 và batch=2) Object_Detection_2 (last.pt model train)
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train3/weights/best.pt")
+        # self.model = YOLO("D:/A_Project/PyCharm_Project/ApplicationRobotics/runs/detect/train3/weights/best.pt")
         # train4 (epoch=20 và batch=2) Object_Detection_2 (best.pt model train)
-        # self.model = YOLO("D:/A_Project/PyCharm_Project/Application_Source/runs/detect/train4/weights/best.pt")
+        # self.model = YOLO("D:/A_Project/PyCharm_Project/ApplicationRobotics/runs/detect/train4/weights/best.pt")
 
         # Load class
         self.license_class = [0, 1, 2, 3, 4]

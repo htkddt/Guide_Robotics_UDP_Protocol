@@ -2,7 +2,7 @@ import sys
 import os
 import numpy as np
 
-Position_folder_path = 'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Test'
+Position_folder_path = 'D:\\A_Project\\PyCharm_Project\\CameraCalibration\\Data\\Position\\Test'
 Position_files = [f for f in os.listdir(Position_folder_path) if f.endswith('.txt')]
 
 Int_matrix = np.array([[608.33, 0, 330.66], [0, 606.7, 242.12], [0, 0, 1]])
@@ -11,7 +11,7 @@ index_folder = 1
 
 
 def read_matrix():
-    txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Cam2base\\Value\\Data_({index_folder})\\Result_cam2base_value.txt'
+    txt = f'D:\\A_Project\\PyCharm_Project\\CameraCalibration\\Cam2base\\Value\\Data_({index_folder})\\Result_cam2base_value.txt'
 
     with open(txt, 'r') as file:
         line = file.readlines()
@@ -31,7 +31,7 @@ def read_matrix():
 
 
 def read_position(index):
-    txt = f'D:\\A_Project\\PyCharm_Project\\Camera_Calibration\\Data\\Position\\Test\\position_({index}).txt'
+    txt = f'D:\\A_Project\\PyCharm_Project\\CameraCalibration\\Data\\Position\\Test\\position_({index}).txt'
 
     with open(txt, 'r') as file:
         line = file.readlines()
