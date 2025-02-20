@@ -26,7 +26,6 @@ class MainWindow(QMainWindow):
 
         # self.uic = MainWindowUI()
         # self.uic.initUI(self)
-        # self.uic.initText()
 
         self.uic = Ui_MainWindow()
         self.uic.setupUi(self)
@@ -1434,7 +1433,7 @@ class CameraThread(QThread):
 
                 tl_point = (min_X, min_Y)
                 br_point = (max_X, max_Y)
-                cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
+                # cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
 
                 binary_float32 = self.yoloSegment.getSegment(color_frame)
 

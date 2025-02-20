@@ -124,7 +124,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>9</pointsize>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="text">
@@ -292,7 +292,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>9</pointsize>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -706,7 +706,7 @@
      </property>
      <property name="font">
       <font>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -1809,7 +1809,7 @@
       <rect>
        <x>310</x>
        <y>29</y>
-       <width>111</width>
+       <width>141</width>
        <height>31</height>
       </rect>
      </property>
@@ -2415,9 +2415,9 @@
     <widget class="QLabel" name="lb_Index">
      <property name="geometry">
       <rect>
-       <x>50</x>
+       <x>30</x>
        <y>330</y>
-       <width>111</width>
+       <width>151</width>
        <height>31</height>
       </rect>
      </property>
@@ -2459,7 +2459,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>240</y>
+       <y>250</y>
        <width>111</width>
        <height>41</height>
       </rect>
@@ -2478,7 +2478,7 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>240</y>
+       <y>250</y>
        <width>111</width>
        <height>41</height>
       </rect>
@@ -2669,7 +2669,7 @@
      <property name="geometry">
       <rect>
        <x>250</x>
-       <y>240</y>
+       <y>250</y>
        <width>111</width>
        <height>41</height>
       </rect>
