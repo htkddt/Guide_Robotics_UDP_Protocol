@@ -30,15 +30,14 @@ class YoloDetection:
         self.results_list = {}
         self.frame_nr = -1
 
-        # Cropp frame
-        self.min_X = 100
-        self.max_X = 300
-        self.min_Y = 275
-        self.max_Y = 420
-
         print("Loading Yolo Detection Model")
 
-    def getObject(self, frame):
+    def getObject(self, frame, minPos, maxPos):
+        min_X = minPos[0]
+        max_X = maxPos[0]
+        min_Y = minPos[1]
+        max_Y = maxPos[1]
+
         point_center = None
         top_left = None
         bottom_right = None
@@ -66,8 +65,8 @@ class YoloDetection:
 
                 point_center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
 
-                if ((point_center[0] > self.min_X) & (point_center[0] < self.max_X) &
-                        (point_center[1] > self.min_Y) & (point_center[1] < self.max_Y)):
+                if ((point_center[0] > min_X) & (point_center[0] < max_X) &
+                    (point_center[1] > min_Y) & (point_center[1] < max_Y)):
 
                     top_left = (int(x1), int(y1))
                     bottom_right = (int(x2), int(y2))

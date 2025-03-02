@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QPushButton, QTextEdit, QSlider, QLabel, QLineEdit
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGroupBox
 from PyQt5.QtWidgets import QMessageBox, QSizePolicy, QFrame
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, QUrl, QSize, QRect, QCoreApplication
+from PyQt5.QtCore import Qt, QUrl, QSize, QRect, QCoreApplication, QPropertyAnimation, pyqtSignal
 
 
 class MainWindowUI(object):
@@ -69,20 +69,7 @@ class MainWindowUI(object):
         lbDeviceRobotStatus.setAlignment(Qt.AlignLeft)
         lbDeviceRobotStatus.setGeometry(10, 150, 131, 20)
 
-        self.btnDeviceRobotBackground = QPushButton(grRobot)
-        self.btnDeviceRobotBackground.setGeometry(150, 142, 60, 30)
-        self.btnDeviceRobotBackground.setStyleSheet(""" 
-            QPushButton {
-                background-color: lightgray;
-                border-radius: 15px;
-            }""")
-        self.btnDeviceRobotCircle = QPushButton(self.btnDeviceRobotBackground)
-        self.btnDeviceRobotCircle.setGeometry(0, 0, 26, 30)
-        self.btnDeviceRobotCircle.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                border-radius: 13px;
-            }""")
+        self.btnDeviceRobot = SwitchButton(mw, grRobot, 150, 142)
 
         lbRobotConnectStatus = QLabel("Connection Robot:", grRobot)
         lbRobotConnectStatus.setFont(self.defaultFontRegular)
@@ -125,20 +112,7 @@ class MainWindowUI(object):
         lbDeviceIOStatus.setAlignment(Qt.AlignLeft)
         lbDeviceIOStatus.setGeometry(10, 150, 131, 20)
 
-        self.btnDeviceIOBackground = QPushButton(grGripper)
-        self.btnDeviceIOBackground.setGeometry(150, 142, 60, 30)
-        self.btnDeviceIOBackground.setStyleSheet(""" 
-            QPushButton {
-                background-color: lightgray;
-                border-radius: 15px;
-            }""")
-        self.btnDeviceIOCircle = QPushButton(self.btnDeviceIOBackground)
-        self.btnDeviceIOCircle.setGeometry(0, 0, 26, 30)
-        self.btnDeviceIOCircle.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                border-radius: 13px;
-            }""")
+        self.btnDeviceIO = SwitchButton(mw, grGripper, 150, 142)
 
         lbIOConnectStatus = QLabel("Connection I/O:", grGripper)
         lbIOConnectStatus.setFont(self.defaultFontRegular)
@@ -442,16 +416,22 @@ class MainWindowUI(object):
         grPulse.setGeometry(50, 30, 141, 211)
 
         self.txtS = QLineEdit(grPulse)
+        self.txtS.setAlignment(Qt.AlignCenter)
         self.txtS.setGeometry(10, 30, 121, 22)
         self.txtL = QLineEdit(grPulse)
+        self.txtL.setAlignment(Qt.AlignCenter)
         self.txtL.setGeometry(10, 60, 121, 22)
         self.txtU = QLineEdit(grPulse)
+        self.txtU.setAlignment(Qt.AlignCenter)
         self.txtU.setGeometry(10, 90, 121, 22)
         self.txtR = QLineEdit(grPulse)
+        self.txtR.setAlignment(Qt.AlignCenter)
         self.txtR.setGeometry(10, 120, 121, 22)
         self.txtB = QLineEdit(grPulse)
+        self.txtB.setAlignment(Qt.AlignCenter)
         self.txtB.setGeometry(10, 150, 121, 22)
         self.txtT = QLineEdit(grPulse)
+        self.txtT.setAlignment(Qt.AlignCenter)
         self.txtT.setGeometry(10, 180, 121, 22)
 
         grCartesian = QGroupBox("CARTESIAN", grGetPosition)
@@ -460,16 +440,22 @@ class MainWindowUI(object):
         grCartesian.setGeometry(290, 30, 141, 211)
 
         self.txtX = QLineEdit(grCartesian)
+        self.txtX.setAlignment(Qt.AlignCenter)
         self.txtX.setGeometry(10, 30, 121, 22)
         self.txtY = QLineEdit(grCartesian)
+        self.txtY.setAlignment(Qt.AlignCenter)
         self.txtY.setGeometry(10, 60, 121, 22)
         self.txtZ = QLineEdit(grCartesian)
+        self.txtZ.setAlignment(Qt.AlignCenter)
         self.txtZ.setGeometry(10, 90, 121, 22)
         self.txtRoll = QLineEdit(grCartesian)
+        self.txtRoll.setAlignment(Qt.AlignCenter)
         self.txtRoll.setGeometry(10, 120, 121, 22)
         self.txtPitch = QLineEdit(grCartesian)
+        self.txtPitch.setAlignment(Qt.AlignCenter)
         self.txtPitch.setGeometry(10, 150, 121, 22)
         self.txtYaw = QLineEdit(grCartesian)
+        self.txtYaw.setAlignment(Qt.AlignCenter)
         self.txtYaw.setGeometry(10, 180, 121, 22)
 
     def initJobControlGroup(self, mw):
@@ -580,10 +566,63 @@ class MainWindowUI(object):
         self.frameDisplayCamera.setFrameShape(QFrame.Box)
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = QMainWindow()
-    uic = MainWindowUI()
-    uic.initUI(window)
-    window.show()
-    sys.exit(app.exec_())
+class SwitchButton(QPushButton):
+    signalSwitchToggled = pyqtSignal(bool)
+
+    def __init__(self, mw, grBox, x, y):
+        super().__init__()
+        self.mainWindow = mw
+        self.status = False
+        self.btnBackground = QPushButton(grBox)
+        self.btnBackground.setGeometry(x, y, 60, 30)
+        self.btnBackground.setStyleSheet(""" 
+            QPushButton {
+                background-color: lightgray;
+                border-radius: 15px;
+            }""")
+        self.btnCircle = QPushButton(self.btnBackground)
+        self.btnCircle.setGeometry(0, 0, 26, 30)
+        self.btnCircle.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                border-radius: 13px;
+            }""")
+        self.animation = QPropertyAnimation(self.btnCircle, b'geometry')
+        self.btnCircle.clicked.connect(self.animationToggled)
+
+    def animationToggled(self):
+        if self.status:
+            self.status = False
+            self.animation.setStartValue(QRect(self.btnCircle.pos().x(), self.btnCircle.pos().y(),
+                                               self.btnCircle.width(), self.btnCircle.height()))
+            self.animation.setEndValue(QRect(self.btnCircle.pos().x() - (self.btnBackground.width() - self.btnCircle.width()),
+                                             self.btnCircle.pos().y(), self.btnCircle.width(), self.btnCircle.height()))
+            self.btnBackground.setStyleSheet(""" 
+                QPushButton {
+                    background-color: lightgray;
+                    border-radius: 15px;
+                }""")
+        else:
+            self.status = True
+            self.animation.setStartValue(QRect(self.btnCircle.pos().x(), self.btnCircle.pos().y(),
+                                               self.btnCircle.width(), self.btnCircle.height()))
+            self.animation.setEndValue(QRect(self.btnCircle.pos().x() + (self.btnBackground.width() - self.btnCircle.width()),
+                                             self.btnCircle.pos().y(), self.btnCircle.width(), self.btnCircle.height()))
+            self.btnBackground.setStyleSheet(""" 
+                QPushButton {
+                    background-color: green;
+                    border-radius: 15px;
+                }""")
+
+        self.animation.setDuration(200)
+        self.animation.start()
+        self.signalSwitchToggled.emit(self.status)
+
+
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     window = QMainWindow()
+#     uic = MainWindowUI()
+#     uic.initUI(window)
+#     window.show()
+#     sys.exit(app.exec_())

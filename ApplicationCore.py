@@ -14,39 +14,83 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 from CameraSource.RealsenseCamera import *
 from ObjectProcess.YoloDetection import *
 from ObjectProcess.YoloSegmentation import *
-# from ApplicationUI import MainWindowUI
-from QtDesignerUI.Guide_htkddt import Ui_MainWindow
+from ApplicationUI import MainWindowUI
+# from QtDesignerUI.Guide_htkddt import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):
-    # Khai báo MainWindow() loại 2
-
     def __init__(self):
         super().__init__()
+        self.uic = MainWindowUI()
+        self.uic.initUI(self)
 
-        # self.uic = MainWindowUI()
-        # self.uic.initUI(self)
-
-        self.uic = Ui_MainWindow()
-        self.uic.setupUi(self)
+        # self.uic = Ui_MainWindow()
+        # self.uic.setupUi(self)
 
         self.DEVICE_ROBOT = False
-        self.uic.btn_Device_Robot.setStyleSheet("""
-            QPushButton {
-                background-color: #c0392b;
-                color: black;
-                font-size: 20px;
-            }""")
-        self.uic.btn_Device_Robot.clicked.connect(self.device_robot_status)
-
         self.DEVICE_IO = False
-        self.uic.btn_Device_IO.setStyleSheet("""
-            QPushButton {
-                background-color: #c0392b;
-                color: black;
-                font-size: 20px;
-            }""")
-        self.uic.btn_Device_IO.clicked.connect(self.device_io_status)
+        self.uic.btnDeviceRobot.signalSwitchToggled.connect(self.device_robot_status)
+        self.uic.btnDeviceIO.signalSwitchToggled.connect(self.device_io_status)
+
+        # Handle event
+        # Connect group
+        self.uic.btnRobotConDis.clicked.connect(self.con_dis_robot_action)
+        self.uic.btnGripperConDis.clicked.connect(self.con_dis_serial_action)
+        # Incremental group
+        self.uic.sliderDistanceMM.valueChanged.connect(self.update_txt1_Dis)
+        self.uic.sliderDistanceDEG.valueChanged.connect(self.update_txt2_Dis)
+        self.uic.sliderSpeedMM.valueChanged.connect(self.update_txt1_Spe)
+        self.uic.sliderSpeedDEG.valueChanged.connect(self.update_txt2_Spe)
+        self.uic.sliderSpeedAuto.valueChanged.connect(self.update_txt_Spe_Auto)
+        self.uic.btnXInc.clicked.connect(self.X_Inc_action)
+        self.uic.btnXDec.clicked.connect(self.X_Dec_action)
+        self.uic.btnYInc.clicked.connect(self.Y_Inc_action)
+        self.uic.btnYDec.clicked.connect(self.Y_Dec_action)
+        self.uic.btnZInc.clicked.connect(self.Z_Inc_action)
+        self.uic.btnZDec.clicked.connect(self.Z_Dec_action)
+        self.uic.btnRollInc.clicked.connect(self.Roll_Inc_action)
+        self.uic.btnRollDec.clicked.connect(self.Roll_Dec_action)
+        self.uic.btnPitchInc.clicked.connect(self.Pitch_Inc_action)
+        self.uic.btnPitchDec.clicked.connect(self.Pitch_Dec_action)
+        self.uic.btnYawInc.clicked.connect(self.Yaw_Inc_action)
+        self.uic.btnYawDec.clicked.connect(self.Yaw_Dec_action)
+        # Basic Control group
+        self.uic.btnAutoMode.clicked.connect(self.mode_auto)
+        self.uic.btnManualMode.clicked.connect(self.mode_manual)
+        self.uic.btnServo.clicked.connect(self.servo_action)
+        self.uic.btnHome.clicked.connect(self.go_home_action)
+        self.uic.btnSerialSend.clicked.connect(self.update_txt_Pulse)
+        # Get Position group
+        self.uic.btnGetPosition.clicked.connect(self.get_position_action)
+
+        # Button
+        # Camera
+        self.uic.btnOpenCloseCamera.clicked.connect(self.open_close_action)
+        self.uic.btnRGBCamera.clicked.connect(self.display_RGB_frame)
+        self.uic.btnBinaryCamera.clicked.connect(self.display_Binary_frame)
+        self.uic.btnDepthCamera.clicked.connect(self.display_Depth_frame)
+        self.uic.btnCaptureAruco.clicked.connect(self.capture_aruco_action)
+        self.uic.btnCaptureObject.clicked.connect(self.capture_object_action)
+        # Job robot
+        self.uic.btnMoveJob.clicked.connect(self.move_job_action)
+        self.uic.btnExitJob.clicked.connect(self.exit_job_action)
+        # Detect option
+        self.uic.btnArucoDetect.clicked.connect(self.aruco_detect_action)
+        self.uic.btnColorDetect.clicked.connect(self.COLOR_detect_action)
+        self.uic.btnYoloDetect.clicked.connect(self.YOLO_detect_action)
+        # Test Job button
+        self.uic.btnTestRunJob.clicked.connect(self.test_job_clicked)
+        # Timer button
+        self.uic.btnTestStartTime.clicked.connect(self.start_time)
+        self.run_time = 0
+        self.uic.btnTestStopTime.clicked.connect(self.stop_time)
+        self.end_time = 0
+        # Position button
+        self.uic.btnTestPositionDetect.clicked.connect(self.pos_pick_clicked)
+        # Move button
+        self.uic.btnTestMovePosition.clicked.connect(self.move_test_clicked)
+        # Background button
+        self.uic.btnCaptureBackground.clicked.connect(self.capture_background_action)
 
         # Camera calibration
         # Create ArUco dictionary
@@ -100,74 +144,8 @@ class MainWindow(QMainWindow):
         self.flag_Detect_YoLo = None
         # Background
         self.flag_Capture_Background = None
-
+        # Check position detect
         # self.flag_GetPoint = None
-
-        # Define status text
-        self.uic.lb_Mode_Value.setText("None")
-        self.uic.lb_Gripper.setText("Gripper: None")
-        self.uic.txt_dt.setText("0.00")
-        self.uic.txt_Status.setText("Byte 5 = 0")
-
-        # Handle event
-        # Connect group
-        self.uic.btn_Robot_ConDis.clicked.connect(self.con_dis_robot_action)
-        self.uic.btn_Serial_ConDis.clicked.connect(self.con_dis_serial_action)
-        # Incremental group
-        self.uic.slider_Dis_mm.valueChanged.connect(self.update_txt1_Dis)
-        self.uic.slider_Dis_deg.valueChanged.connect(self.update_txt2_Dis)
-        self.uic.slider_Spe_mm.valueChanged.connect(self.update_txt1_Spe)
-        self.uic.slider_Spe_deg.valueChanged.connect(self.update_txt2_Spe)
-        self.uic.slider_Spe_Auto.valueChanged.connect(self.update_txt_Spe_Auto)
-        self.uic.btn_X_Inc.clicked.connect(self.X_Inc_action)
-        self.uic.btn_X_Dec.clicked.connect(self.X_Dec_action)
-        self.uic.btn_Y_Inc.clicked.connect(self.Y_Inc_action)
-        self.uic.btn_Y_Dec.clicked.connect(self.Y_Dec_action)
-        self.uic.btn_Z_Inc.clicked.connect(self.Z_Inc_action)
-        self.uic.btn_Z_Dec.clicked.connect(self.Z_Dec_action)
-        self.uic.btn_Roll_Inc.clicked.connect(self.Roll_Inc_action)
-        self.uic.btn_Roll_Dec.clicked.connect(self.Roll_Dec_action)
-        self.uic.btn_Pitch_Inc.clicked.connect(self.Pitch_Inc_action)
-        self.uic.btn_Pitch_Dec.clicked.connect(self.Pitch_Dec_action)
-        self.uic.btn_Yaw_Inc.clicked.connect(self.Yaw_Inc_action)
-        self.uic.btn_Yaw_Dec.clicked.connect(self.Yaw_Dec_action)
-        # Basic Control group
-        self.uic.btn_Auto.clicked.connect(self.mode_auto)
-        self.uic.btn_Manual.clicked.connect(self.mode_manual)
-        self.uic.btn_Servo.clicked.connect(self.servo_action)
-        self.uic.btn_Home.clicked.connect(self.go_home_action)
-        self.uic.btn_Serial.clicked.connect(self.update_txt_Pulse)
-        # Get Position group
-        self.uic.btn_Get_Position.clicked.connect(self.get_position_action)
-
-        # Button
-        # Camera
-        self.uic.btn_Open_Close.clicked.connect(self.open_close_action)
-        self.uic.btn_RGB.clicked.connect(self.display_RGB_frame)
-        self.uic.btn_Binary.clicked.connect(self.display_Binary_frame)
-        self.uic.btn_Depth.clicked.connect(self.display_Depth_frame)
-        self.uic.btn_Capture_Aruco.clicked.connect(self.capture_aruco_action)
-        self.uic.btn_Capture_Object.clicked.connect(self.capture_object_action)
-        # Job robot
-        self.uic.btn_Move_Job.clicked.connect(self.move_job_action)
-        self.uic.btn_Exit_Job.clicked.connect(self.exit_job_action)
-        # Detect option
-        self.uic.btn_Aruco_Detect.clicked.connect(self.aruco_detect_action)
-        self.uic.btn_COLOR_Detect.clicked.connect(self.COLOR_detect_action)
-        self.uic.btn_YOLO_detect.clicked.connect(self.YOLO_detect_action)
-        # Test Job button
-        self.uic.btn_Test_Job.clicked.connect(self.test_job_clicked)
-        # Timer button
-        self.uic.btn_Start.clicked.connect(self.start_time)
-        self.run_time = 0
-        self.uic.btn_Stop.clicked.connect(self.stop_time)
-        self.end_time = 0
-        # Position button
-        self.uic.btn_Pos_Pick.clicked.connect(self.pos_pick_clicked)
-        # Move button
-        self.uic.btn_Move_Test.clicked.connect(self.move_test_clicked)
-        # Background button
-        self.uic.btn_Background.clicked.connect(self.capture_background_action)
 
     def close(self):
         self.camera.running = False
@@ -177,36 +155,18 @@ class MainWindow(QMainWindow):
         self.camera.quit()
 
     # FEATURE FUNCTION OF PROJECT
-    def device_robot_status(self):
-        if not self.DEVICE_ROBOT:
-            self.DEVICE_ROBOT = True
-
+    def device_robot_status(self, status):
+        if status:  # Init Thread if status switch button is True
             # Robot socket
             self.socket = RobotSocket()
 
             # Timer
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.update_timer)
+        self.DEVICE_ROBOT = status
 
-            self.uic.btn_Device_Robot.setStyleSheet(""" 
-                QPushButton {
-                    background-color: #2ecc71;
-                    color: black;
-                    font-size: 20px;
-                }""")
-        else:
-            self.DEVICE_ROBOT = False
-            self.uic.btn_Device_Robot.setStyleSheet(""" 
-                QPushButton {
-                    background-color: #c0392b;
-                    color: black;
-                    font-size: 20px;
-                }""")
-
-    def device_io_status(self):
-        if not self.DEVICE_IO:
-            self.DEVICE_IO = True
-
+    def device_io_status(self, status):
+        if status:  # Init Thread if status switch button is True
             # Camera
             self.camera = CameraThread()
             self.camera.image.connect(self.update_frame)
@@ -215,81 +175,65 @@ class MainWindow(QMainWindow):
             # self.serial = SerialProcess()
             # self.serial.message.connect(self.update_serial)
             self.method = 0
-
-            self.uic.btn_Device_IO.setStyleSheet(""" 
-                QPushButton {
-                    background-color: #2ecc71;
-                    color: black;
-                    font-size: 20px;
-                }""")
-        else:
-            self.DEVICE_IO = False
-            self.uic.btn_Device_IO.setStyleSheet(""" 
-                QPushButton {
-                    background-color: #c0392b;
-                    color: black;
-                    font-size: 20px;
-                }""")
+        self.DEVICE_IO = status
 
     def con_dis_robot_action(self):
         if not self.DEVICE_ROBOT:
             return
 
-        if self.uic.btn_Robot_ConDis.text() == "Connect":
-            self.uic.btn_Robot_ConDis.setText("Disconnect")
+        if self.uic.btnRobotConDis.text() == "Connect":
+            self.uic.btnRobotConDis.setText("Disconnect")
 
             # Lấy dữ liệu IP và Port
-            IP = self.uic.txt_IP.text()
-            Port = int(self.uic.txt_Port.text())
+            IP = self.uic.txtIPRobot.text()
+            Port = int(self.uic.txtPortRobot.text())
 
             self.socket.robot_address(IP, Port)
             self.socket.status = 0
             self.socket.start()
-            self.uic.lb_Connect_Disconnect.setText("Connected")
+            self.uic.txtRobotConnectStatus.setText("Connected")
 
-        elif self.uic.btn_Robot_ConDis.text() == "Disconnect":
-            self.uic.btn_Robot_ConDis.setText("Connect")
+        elif self.uic.btnRobotConDis.text() == "Disconnect":
+            self.uic.btnRobotConDis.setText("Connect")
             self.socket.disconnect()
-            self.uic.lb_Connect_Disconnect.setText("Disconnected") # ADD SWITCH BUTTON
+            self.uic.txtRobotConnectStatus.setText("Disconnected")
 
     def con_dis_serial_action(self):
         if not self.DEVICE_IO:
             return
 
-        if self.uic.btn_Serial_ConDis.text() == "Connect":
-            self.uic.btn_Serial_ConDis.setText("Disconnect")
-            Port = self.uic.txt_Port_.text()
-            Baud = int(self.uic.txt_Baudrate.text())
+        if self.uic.btnGripperConDis.text() == "Connect":
+            self.uic.btnGripperConDis.setText("Disconnect")
+            Port = self.uic.txtPortGripper.text()
+            Baud = int(self.uic.txtBaudGripper.text())
             self.serial.serial_connect(Port)
             self.serial.start()
-            self.uic.lb_Connect_Disconnect_.setText("Connected")
+            self.uic.txtIOConnectStatus.setText("Connected")
 
-        elif self.uic.btn_Serial_ConDis.text() == "Disconnect":
-            self.uic.btn_Serial_ConDis.setText("Connect")
+        elif self.uic.btnGripperConDis.text() == "Disconnect":
+            self.uic.btnGripperConDis.setText("Connect")
             self.serial.serial_disconnect()
-            self.uic.lb_Connect_Disconnect_.setText("Disconnected") # ADD SWITCH BUTTON
+            self.uic.txtIOConnectStatus.setText("Disconnected")
 
     def mode_auto(self):
         self.flag_Auto = True
         self.flag_Manual = False
-        self.uic.lb_Mode_Value.setText("AUTO")
+        self.uic.txtModeValue.setText("AUTO")
 
     def mode_manual(self):
         self.flag_Auto = False
         self.flag_Manual = True
-        self.uic.lb_Mode_Value.setText("MANUAL")
+        self.uic.txtModeValue.setText("MANUAL")
 
     def open_close_action(self):
         if not self.DEVICE_IO:
             return
 
         self.camera.flag_Detect_YOLO = False
-        self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
         self.camera.flag_Detect_COLOR = False
-        self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
 
-        if self.uic.btn_Open_Close.text() == "Open Camera":
-            self.uic.btn_Open_Close.setText("Close Camera")
+        if self.uic.btnOpenCloseCamera.text() == "Open Camera":
+            self.uic.btnOpenCloseCamera.setText("Close Camera")
             if not self.camera.isRunning():
                 self.flag_RGB = True
                 self.camera.cnt = 0
@@ -310,8 +254,8 @@ class MainWindow(QMainWindow):
                       "fx = " + str(self.fx) + '\n' +
                       "fy = " + str(self.fy))
 
-        elif self.uic.btn_Open_Close.text() == "Close Camera":
-            self.uic.btn_Open_Close.setText("Open Camera")
+        elif self.uic.btnOpenCloseCamera.text() == "Close Camera":
+            self.uic.btnOpenCloseCamera.setText("Open Camera")
             if self.camera.isRunning():
                 self.camera.running = False
                 self.flag_RGB = False
@@ -376,7 +320,7 @@ class MainWindow(QMainWindow):
         if not self.DEVICE_ROBOT:
             return
 
-        if self.uic.lb_Mode_Value.text() == "NONE":
+        if self.uic.txtModeValue.text() == "NONE":
             return
 
         Data = None
@@ -387,7 +331,7 @@ class MainWindow(QMainWindow):
         Attribute = bytes([0x01])
         Service = bytes([0x10])
 
-        if self.uic.btn_Servo.text() == "Servo On":
+        if self.uic.btnServo.text() == "Servo On":
             Data = bytes([0x01, 0x00, 0x00, 0x00])
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
             self.socket.send_function(frame)
@@ -400,7 +344,7 @@ class MainWindow(QMainWindow):
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
                     self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
                     self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4)
-                    self.set_double_action(self.uic.slider_Spe_Auto.value(), 0)
+                    self.set_double_action(self.uic.sliderSpeedAuto.value(), 0)
                     self.set_byte_action(0, 1)
                     self.set_byte_action(0, 2)
                     self.set_byte_action(0, 3)
@@ -409,16 +353,16 @@ class MainWindow(QMainWindow):
                     # self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
-            self.uic.btn_Servo.setText("Servo Off")
+            self.uic.btnServo.setText("Servo Off")
 
-        elif self.uic.btn_Servo.text() == "Servo Off":
+        elif self.uic.btnServo.text() == "Servo Off":
             Data = bytes([0x02, 0x00, 0x00, 0x00])
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
             self.socket.send_function(frame)
             self.socket.received_function()
             self.set_byte_action(0, 0)
             self.timer.stop()
-            self.uic.btn_Servo.setText("Servo On")
+            self.uic.btnServo.setText("Servo On")
 
         self.get_position_action()
 
@@ -565,19 +509,19 @@ class MainWindow(QMainWindow):
             sixth_axis_value = int.from_bytes(sixth_axis, byteorder='little', signed=True)
 
             if status == 0:
-                self.uic.txt_S.setText(str(int(first_axis_value * 30 / 34816)))
-                self.uic.txt_L.setText(str(int(second_axis_value * 90 / 102400)))
-                self.uic.txt_U.setText(str(int(third_axis_value * 90 / 51200)))
-                self.uic.txt_R.setText(str(int(fourth_axis_value * 30 / 10204)))
-                self.uic.txt_B.setText(str(int(fifth_axis_value * 30 / 10204)))
-                self.uic.txt_T.setText(str(int(sixth_axis_value * 30 / 10204)))
+                self.uic.txtS.setText(str(int(first_axis_value * 30 / 34816)))
+                self.uic.txtL.setText(str(int(second_axis_value * 90 / 102400)))
+                self.uic.txtU.setText(str(int(third_axis_value * 90 / 51200)))
+                self.uic.txtR.setText(str(int(fourth_axis_value * 30 / 10204)))
+                self.uic.txtB.setText(str(int(fifth_axis_value * 30 / 10204)))
+                self.uic.txtT.setText(str(int(sixth_axis_value * 30 / 10204)))
             elif status == 1:
-                self.uic.txt_X.setText(str((first_axis_value / 1000)))
-                self.uic.txt_Y.setText(str((second_axis_value / 1000)))
-                self.uic.txt_Z.setText(str((third_axis_value / 1000)))
-                self.uic.txt_Roll.setText(str((fourth_axis_value / 10000)))
-                self.uic.txt_Pitch.setText(str((fifth_axis_value / 10000)))
-                self.uic.txt_Yaw.setText(str((sixth_axis_value / 10000)))
+                self.uic.txtX.setText(str((first_axis_value / 1000)))
+                self.uic.txtY.setText(str((second_axis_value / 1000)))
+                self.uic.txtZ.setText(str((third_axis_value / 1000)))
+                self.uic.txtRoll.setText(str((fourth_axis_value / 10000)))
+                self.uic.txtPitch.setText(str((fifth_axis_value / 10000)))
+                self.uic.txtYaw.setText(str((sixth_axis_value / 10000)))
 
             status += 1
 
@@ -680,14 +624,14 @@ class MainWindow(QMainWindow):
         self.move_command_action(0, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def X_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
-        X_ = X * 1000 + int(self.uic.slider_Dis_mm.value())
+        X_ = X * 1000 + int(self.uic.sliderDistanceMM.value())
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
@@ -697,14 +641,14 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def X_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
-        X_ = X * 1000 - int(self.uic.slider_Dis_mm.value())
+        X_ = X * 1000 - int(self.uic.sliderDistanceMM.value())
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
@@ -714,15 +658,15 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Y_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
-        Y_ = Y * 1000 + int(self.uic.slider_Dis_mm.value())
+        Y_ = Y * 1000 + int(self.uic.sliderDistanceMM.value())
         Z_ = Z * 1000
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
@@ -731,15 +675,15 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Y_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
-        Y_ = Y * 1000 - int(self.uic.slider_Dis_mm.value())
+        Y_ = Y * 1000 - int(self.uic.sliderDistanceMM.value())
         Z_ = Z * 1000
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
@@ -748,16 +692,16 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Z_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
-        Z_ = Z * 1000 + int(self.uic.slider_Dis_mm.value())
+        Z_ = Z * 1000 + int(self.uic.sliderDistanceMM.value())
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
         Yaw_ = Yaw * 10000
@@ -765,16 +709,16 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Z_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
-        Z_ = Z * 1000 - int(self.uic.slider_Dis_mm.value())
+        Z_ = Z * 1000 - int(self.uic.sliderDistanceMM.value())
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
         Yaw_ = Yaw * 10000
@@ -782,129 +726,129 @@ class MainWindow(QMainWindow):
         self.move_command_action(1, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Roll_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
-        Roll_ = Roll * 10000 + int(self.uic.slider_Dis_deg.value())
+        Roll_ = Roll * 10000 + int(self.uic.sliderDistanceDEG.value())
         Pitch_ = Pitch * 10000
         Yaw_ = Yaw * 10000
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Roll_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
-        Roll_ = Roll * 10000 - int(self.uic.slider_Dis_deg.value())
+        Roll_ = Roll * 10000 - int(self.uic.sliderDistanceDEG.value())
         Pitch_ = Pitch * 10000
         Yaw_ = Yaw * 10000
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Pitch_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
-        Pitch_ = Pitch * 10000 + int(self.uic.slider_Dis_deg.value())
+        Pitch_ = Pitch * 10000 + int(self.uic.sliderDistanceDEG.value())
         Yaw_ = Yaw * 10000
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Pitch_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
-        Pitch_ = Pitch * 10000 - int(self.uic.slider_Dis_deg.value())
+        Pitch_ = Pitch * 10000 - int(self.uic.sliderDistanceDEG.value())
         Yaw_ = Yaw * 10000
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Yaw_Inc_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
-        Yaw_ = Yaw * 10000 + int(self.uic.slider_Dis_deg.value())
+        Yaw_ = Yaw * 10000 + int(self.uic.sliderDistanceDEG.value())
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def Yaw_Dec_action(self):
-        X = float(self.uic.txt_X.text())
-        Y = float(self.uic.txt_Y.text())
-        Z = float(self.uic.txt_Z.text())
-        Roll = float(self.uic.txt_Roll.text())
-        Pitch = float(self.uic.txt_Pitch.text())
-        Yaw = float(self.uic.txt_Yaw.text())
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
 
         X_ = X * 1000
         Y_ = Y * 1000
         Z_ = Z * 1000
         Roll_ = Roll * 10000
         Pitch_ = Pitch * 10000
-        Yaw_ = Yaw * 10000 - int(self.uic.slider_Dis_deg.value())
+        Yaw_ = Yaw * 10000 - int(self.uic.sliderDistanceDEG.value())
 
         self.move_command_action(2, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
     def update_txt1_Dis(self):
-        value = self.uic.slider_Dis_mm.value()
-        self.uic.txt1_Dis_Value.setText(str(value))
+        value = self.uic.sliderDistanceMM.value()
+        self.uic.txtDisMM.setText(str(value))
 
     def update_txt2_Dis(self):
-        value = self.uic.slider_Dis_deg.value()
-        self.uic.txt2_Dis_Value.setText(str(value))
+        value = self.uic.sliderDistanceDEG.value()
+        self.uic.txtDisDEG.setText(str(value))
 
     def update_txt1_Spe(self):
-        value = self.uic.slider_Spe_mm.value()
-        self.uic.txt1_Spe_Value.setText(str(value))
+        value = self.uic.sliderSpeedMM.value()
+        self.uic.txtSpeMM.setText(str(value))
 
     def update_txt2_Spe(self):
-        value = self.uic.slider_Spe_deg.value()
-        self.uic.txt2_Spe_Value.setText(str(value))
+        value = self.uic.sliderSpeedDEG.value()
+        self.uic.txtSpeDEG.setText(str(value))
 
     def update_txt_Spe_Auto(self):
-        value = self.uic.slider_Spe_Auto.value()
-        self.uic.txt_Spe_Auto.setText(str(value))
+        value = self.uic.sliderSpeedAuto.value()
+        self.uic.txtSpeAuto.setText(str(value))
 
     def update_txt_Pulse(self):
-        Value = self.uic.txt_Pulse.text()
+        Value = self.uic.txtSeralValue.text()
         self.serial_process_action(Value)
 
     def display_RGB_frame(self):
@@ -932,61 +876,61 @@ class MainWindow(QMainWindow):
         self.flag_Capture_Background = True
 
     def aruco_detect_action(self):
-        if self.uic.btn_Aruco_Detect.text() == "ArUco Detect ON":
+        if self.uic.btnArucoDetect.text() == "ArUco Detect ON":
             self.flag_Detect_ArUco = True
             self.camera.flag_Detect_COLOR = False
             self.camera.flag_Detect_YOLO = False
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect OFF")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+            self.uic.btnArucoDetect.setText("ArUco Detect OFF")
+            self.uic.btnColorDetect.setText("COLOR Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect ON")
 
-        elif self.uic.btn_Aruco_Detect.text() == "ArUco Detect OFF":
+        elif self.uic.btnArucoDetect.text() == "ArUco Detect OFF":
             self.flag_Detect_ArUco = False
             self.camera.flag_Detect_COLOR = False
             self.camera.flag_Detect_YOLO = False
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+            self.uic.btnArucoDetect.setText("ArUco Detect ON")
+            self.uic.btnColorDetect.setText("COLOR Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect ON")
 
     def COLOR_detect_action(self):
-        if self.uic.btn_COLOR_Detect.text() == "COLOR Detect ON":
+        if self.uic.btnColorDetect.text() == "COLOR Detect ON":
             self.camera.flag_Detect_COLOR = True
             self.flag_Detect_ArUco = False
             self.camera.flag_Detect_YOLO = False
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect OFF")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+            self.uic.btnColorDetect.setText("COLOR Detect OFF")
+            self.uic.btnArucoDetect.setText("ArUco Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect ON")
 
-        elif self.uic.btn_COLOR_Detect.text() == "COLOR Detect OFF":
+        elif self.uic.btnColorDetect.text() == "COLOR Detect OFF":
             self.camera.flag_Detect_COLOR = False
             self.flag_Detect_ArUco = False
             self.camera.flag_Detect_YOLO = False
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
+            self.uic.btnColorDetect.setText("COLOR Detect ON")
+            self.uic.btnArucoDetect.setText("ArUco Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect ON")
 
     def YOLO_detect_action(self):
-        if self.uic.btn_YOLO_detect.text() == "YOLO Detect ON":
+        if self.uic.btnYoloDetect.text() == "YOLO Detect ON":
             self.camera.flag_Detect_YOLO = True
             self.flag_Detect_ArUco = False
             self.camera.flag_Detect_COLOR = False
-            self.uic.btn_YOLO_detect.setText("YOLO Detect OFF")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect OFF")
+            self.uic.btnArucoDetect.setText("ArUco Detect ON")
+            self.uic.btnColorDetect.setText("COLOR Detect ON")
 
-        elif self.uic.btn_YOLO_detect.text() == "YOLO Detect OFF":
+        elif self.uic.btnYoloDetect.text() == "YOLO Detect OFF":
             self.camera.flag_Detect_YOLO = False
             self.flag_Detect_ArUco = False
             self.camera.flag_Detect_COLOR = False
-            self.uic.btn_YOLO_detect.setText("YOLO Detect ON")
-            self.uic.btn_Aruco_Detect.setText("ArUco Detect ON")
-            self.uic.btn_COLOR_Detect.setText("COLOR Detect ON")
+            self.uic.btnYoloDetect.setText("YOLO Detect ON")
+            self.uic.btnArucoDetect.setText("ArUco Detect ON")
+            self.uic.btnColorDetect.setText("COLOR Detect ON")
 
     def move_job_action(self):
         if not self.DEVICE_ROBOT or not self.DEVICE_IO:
             return
 
-        if self.uic.btn_Move_Job.text() == "MOVE JOB":
+        if self.uic.btnMoveJob.text() == "MOVE JOB":
             ret = self.job_select_function(7, b'MOVEJOB')
             if ret:
                 self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
@@ -995,16 +939,16 @@ class MainWindow(QMainWindow):
                 self.start_job_function()
             self.flag_Enable_Job = True
             self.serial_process_action(80)
-            self.uic.btn_Move_Job.setText("RUN JOB")
+            self.uic.btnMoveJob.setText("RUN JOB")
 
-        elif self.uic.btn_Move_Job.text() == "RUN JOB":
+        elif self.uic.btnMoveJob.text() == "RUN JOB":
             if self.flag_Manual:
                 self.flag_Process = True
-                self.uic.btn_Move_Job.setText("RUNNING")
+                self.uic.btnMoveJob.setText("RUNNING")
             elif self.flag_Auto:
-                self.uic.btn_Move_Job.setText("RUNNING")
+                self.uic.btnMoveJob.setText("RUNNING")
 
-        elif self.uic.btn_Move_Job.text() == "RUNNING":
+        elif self.uic.btnMoveJob.text() == "RUNNING":
             self.set_position_action(int(self.X_), int(self.Y_), 27000,
                                      int(self.Roll_), int(self.Pitch_), int(self.Yaw_),
                                      2)
@@ -1014,16 +958,16 @@ class MainWindow(QMainWindow):
             self.set_byte_action(1, 2)
             self.set_byte_action(0, 5)
             if self.flag_Manual:
-                self.uic.btn_Move_Job.setText("RUN JOB")
+                self.uic.btnMoveJob.setText("RUN JOB")
 
     def exit_job_action(self):
         if not self.DEVICE_ROBOT or not self.DEVICE_IO:
             return
 
-        if self.uic.btn_Move_Job.text() == "RUNNING":
-            self.uic.btn_Move_Job.setText("MOVE JOB")
-        elif self.uic.btn_Move_Job.text() == "RUN JOB":
-            self.uic.btn_Move_Job.setText("MOVE JOB")
+        if self.uic.btnMoveJob.text() == "RUNNING":
+            self.uic.btnMoveJob.setText("MOVE JOB")
+        elif self.uic.btnMoveJob.text() == "RUN JOB":
+            self.uic.btnMoveJob.setText("MOVE JOB")
         self.flag_Enable_Job = False
         self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
         self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
@@ -1069,9 +1013,9 @@ class MainWindow(QMainWindow):
         tve = None
 
         if obj_detect:
-            self.uic.lb_Object.setText("Object: True")
+            self.uic.lbOjectStatus.setText("Object: True")
         else:
-            self.uic.lb_Object.setText("Object: False")
+            self.uic.lbOjectStatus.setText("Object: False")
 
         if flag_last_id:
             if self.flag_Enable_Job:
@@ -1212,23 +1156,23 @@ class MainWindow(QMainWindow):
                                 self.flag_Process = False
 
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-            self.uic.Display_frame.setPixmap(QPixmap.fromImage(pixmap))
+            self.uic.frameDisplayCamera.setPixmap(QPixmap.fromImage(pixmap))
 
         elif self.flag_Binary:
             frame = binary_frame
 
             # Ảnh Binary thì dùng Format Indexed8
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_Indexed8)
-            self.uic.Display_frame.setPixmap(QPixmap.fromImage(pixmap))
+            self.uic.frameDisplayCamera.setPixmap(QPixmap.fromImage(pixmap))
 
         elif self.flag_Depth:
             frame = cv2.cvtColor(depth_frame, cv2.COLOR_BGR2RGB)
 
             pixmap = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-            self.uic.Display_frame.setPixmap(QPixmap.fromImage(pixmap))
+            self.uic.frameDisplayCamera.setPixmap(QPixmap.fromImage(pixmap))
 
         else:
-            self.uic.Display_frame.clear()
+            self.uic.frameDisplayCamera.clear()
 
     def update_timer(self):
         if self.flag_Select:
@@ -1425,15 +1369,15 @@ class CameraThread(QThread):
 
             if ret:
                 # Vẽ vùng làm việc
-                mean = 200
-                min_X = 100
-                max_X = 300
-                min_Y = 275
-                max_Y = 420
+                mean = 120
+                min_X = 118
+                max_X = 237
+                min_Y = 172
+                max_Y = 279
 
                 tl_point = (min_X, min_Y)
                 br_point = (max_X, max_Y)
-                # cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 1)
+                cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 2)
 
                 binary_float32 = self.yoloSegment.getSegment(color_frame)
 
@@ -1447,7 +1391,7 @@ class CameraThread(QThread):
 
                 if self.flag_Detect_YOLO:
                     color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(
-                        color_frame)
+                        color_frame, tl_point, br_point)
 
                     if last_id is None:
                         flag_last_id = False
