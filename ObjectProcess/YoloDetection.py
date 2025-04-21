@@ -33,10 +33,12 @@ class YoloDetection:
         print("Loading Yolo Detection Model")
 
     def getObject(self, frame, minPos, maxPos):
-        min_X = minPos[0]
-        max_X = maxPos[0]
-        min_Y = minPos[1]
-        max_Y = maxPos[1]
+        min_X = max_X = min_Y = max_Y = 0
+        if minPos != 0 & maxPos != 0:
+            min_X = minPos[0]
+            max_X = maxPos[0]
+            min_Y = minPos[1]
+            max_Y = maxPos[1]
 
         point_center = None
         top_left = None
