@@ -393,7 +393,7 @@
      </font>
     </property>
     <property name="title">
-     <string>GET POSITION</string>
+     <string>POSITION</string>
     </property>
     <widget class="QLabel" name="lb_Pitch_Current">
      <property name="geometry">
@@ -700,7 +700,7 @@
       <rect>
        <x>20</x>
        <y>250</y>
-       <width>441</width>
+       <width>211</width>
        <height>41</height>
       </rect>
      </property>
@@ -1287,6 +1287,26 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QPushButton" name="btn_Set_Position">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>250</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Set Position</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="gr_Basic_Control">
     <property name="geometry">
@@ -1330,9 +1350,9 @@
     <widget class="QLineEdit" name="txt_Pulse">
      <property name="geometry">
       <rect>
-       <x>390</x>
+       <x>460</x>
        <y>30</y>
-       <width>151</width>
+       <width>81</width>
        <height>41</height>
       </rect>
      </property>
@@ -1474,6 +1494,32 @@
      </property>
      <property name="text">
       <string>Mode:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lb_Value">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>30</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="text">
+      <string>Value:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
