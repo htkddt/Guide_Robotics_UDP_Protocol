@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 
 from ObjectProcess.YoloDetection import *
 from ObjectProcess.YoloSegmentation import *
-from ApplicationUI.Guide_test import *
+from QtDesignerUI.Guide_test import *
 
 
 class MainWindow(QMainWindow):
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
 
     def detect_action(self):
         conv = cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR)
-        img, last_id, _, _, top_left, bottom_right, _ = self.yoloDetect.getObject(conv)
+        img, last_id, _, _, top_left, bottom_right, _ = self.yoloDetect.getObject(conv, 0, 0)
         self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         binary_float32 = self.yoloSegment.getSegment(conv)

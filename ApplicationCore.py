@@ -17,6 +17,54 @@ from ObjectProcess.YoloSegmentation import *
 from ApplicationUI import MainWindowUI
 # from QtDesignerUI.Guide_htkddt import Ui_MainWindow
 
+CMD_AXIS_CONFIG = bytes([0x74, 0x00])
+CMD_SERVO = bytes([0x83, 0x00])
+CMD_MOVE_CARTESIAN = bytes([0x8A, 0x00])
+CMD_JOB_SELECT = bytes([0x87, 0x00])
+CMD_START_JOB = bytes([0x86, 0x00])
+CMD_ROBOT_DATA_POSITION = bytes([0x75, 0x00]) # Robot position data reading
+CMD_POSITION_VARIABLE = bytes([0x7F, 0x00]) # Robot position variable (Reading/Writing)
+CMD_BYTE_VARIABLE = bytes([0x7A, 0x00])
+CMD_DOUBLE_VARIABLE = bytes([0x7C, 0x00])
+
+INSTANCE_PULSE = bytes([0x01, 0x00])
+INSTANCE_CARTESIAN = bytes([0x65, 0x00])
+INSTANCE_SERVO = bytes([0x02, 0x00])
+INSTANCE_MOVE_CARTESIAN_LINK = bytes([0x01, 0x00])
+INSTANCE_MOVE_CARTESIAN_STRAIGHT_ABSOLUTE = bytes([0x02, 0x00])
+INSTANCE_MOVE_CARTESIAN_STRAIGHT_INCREMENT = bytes([0x03, 0x00])
+INSTANCE_JOB_SELECT = bytes([0x01, 0x00])
+INSTANCE_START_JOB = bytes([0x01, 0x00])
+
+ATTRIBUTE_AXIS_CONFIG = bytes([0x00])
+ATTRIBUTE_FIXED = bytes([0x01])
+ATTRIBUTE_JOB_SELECT_NAME = bytes([0x01])
+ATTRIBUTE_JOB_SELECT_LINE = bytes([0x02])
+ATTRIBUTE_ROBOT_DATA_POSITION = bytes([0x00])
+ATTRIBUTE_POSITION_VARIABLE = bytes([0x00])
+
+SERVICE_READ_SINGLE = bytes([0x0E])
+SERVICE_READ_ALL = bytes([0x01])
+SERVICE_WRITE_SINGLE = bytes([0x10])
+SERVICE_WRITE_ALL = bytes([0x02])
+SERVICE_SERVO = bytes([0x10])
+SERVICE_MOVE_CARTESIAN = bytes([0x02])
+SERVICE_JOB_SELECT = bytes([0x02])
+SERVICE_START_JOB = bytes([0x10])
+
+DATA_PART_DEFAULT = bytes([0x04, 0x00])
+DATA_PART_MOVE_CARTESIAN = bytes([0x68, 0x00])
+DATA_PART_POSITION_VARIABLE = bytes([0x2C, 0x00])
+DATA_PART_BYTE_VARIABLE = bytes([0x01, 0x00])
+
+DATA_NONE = bytes([0x00, 0x00, 0x00, 0x00])
+DATA_SERVO_ON = bytes([0x01, 0x00, 0x00, 0x00])
+DATA_SERVO_OFF = bytes([0x02, 0x00, 0x00, 0x00])
+DATA_START_JOB = bytes([0x01, 0x00, 0x00, 0x00])
+DATA_BYTE_VARIABLE = bytes([0x00])
+
+REQUEST_ID = bytes([0x00])
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -61,7 +109,8 @@ class MainWindow(QMainWindow):
         self.uic.btnHome.clicked.connect(self.go_home_action)
         self.uic.btnSerialSend.clicked.connect(self.update_txt_Pulse)
         # Get Position group
-        self.uic.btnGetPosition.clicked.connect(self.get_position_action)
+        self.uic.btnGetPosition.clicked.connect(self.robot_data_position)
+        self.uic.btnSetPosition.clicked.connect(self.init_data_position)
 
         # Button
         # Camera
@@ -120,6 +169,30 @@ class MainWindow(QMainWindow):
         self.Roll_ = None
         self.Pitch_ = None
         self.Yaw_ = None
+
+        # Postion home
+        self.XHome = 185 * 1000
+        self.YHome = 0
+        self.ZHome = 25 * 1000
+        self.RollHome = 180 * 10000
+        self.PitchHome = 0
+        self.YawHome = 0
+
+        # Position ready
+        self.XInit = 23 * 1000
+        self.YInit = 0
+        self.ZInit = 35 * 1000
+        self.RollInit = 180 * 10000
+        self.PitchInit = 0
+        self.YawInit = 0
+
+        # Position place
+        self.XPlace = -54 * 1000
+        self.YPlace = -286.303 * 1000
+        self.ZPlace = 27 * 1000
+        self.RollPlace = 180 * 10000
+        self.PitchPlace = 0
+        self.YawPlace = -90 * 10000
 
         # Define MODE flag
         self.flag_Auto = None
@@ -282,12 +355,12 @@ class MainWindow(QMainWindow):
         return frame_data
 
     def axis_config_function(self):
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0x00])
-        Command = bytes([0x74, 0x00])
-        Attribute = bytes([0x00])
-        Service = bytes([0x01])
-        Data = bytes([0x00, 0x00, 0x00, 0x00])
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_AXIS_CONFIG
+        Attribute = ATTRIBUTE_AXIS_CONFIG
+        Service = SERVICE_READ_ALL
+        Data = DATA_NONE
         # Instance = None
         # Khi config trục Data trong Request là không có (0x00 0x00 0x00 0x00)
         # Khi config trục kiểu Pulse thì Instance = 1 (0x01 0x00)
@@ -297,7 +370,7 @@ class MainWindow(QMainWindow):
 
         while status < 2:
             if status == 0:
-                Instance = bytes([0x01, 0x00])
+                Instance = INSTANCE_PULSE
 
                 frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -305,7 +378,7 @@ class MainWindow(QMainWindow):
                 self.socket.received_function()
 
             elif status == 1:
-                Instance = bytes([0x65, 0x00])
+                Instance = INSTANCE_CARTESIAN
 
                 frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -324,15 +397,15 @@ class MainWindow(QMainWindow):
             return
 
         Data = None
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0x01])
-        Command = bytes([0x83, 0x00])
-        Instance = bytes([0x02, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x10])
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_SERVO
+        Instance = INSTANCE_SERVO
+        Attribute = ATTRIBUTE_SERVO
+        Service = SERVICE_SERVO
 
         if self.uic.btnServo.text() == "Servo On":
-            Data = bytes([0x01, 0x00, 0x00, 0x00])
+            Data = DATA_SERVO_ON
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
             self.socket.send_function(frame)
             self.socket.received_function()
@@ -340,23 +413,27 @@ class MainWindow(QMainWindow):
             if self.socket.flag_connected:
                 status = self.axis_config_function()
                 if status:
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 1)
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
-                    self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
-                    self.set_position_action(-54000, -286303, 27000, 1800000, 0, -900000, 4)
-                    self.set_double_action(self.uic.sliderSpeedAuto.value(), 0)
+                    self.set_position_action(self.XInit, self.YInit, self.ZInit,
+                                             self.RollInit, self.PitchInit, self.YawInit, 1)
+                    self.set_position_action(self.XInit, self.YInit, self.ZInit,
+                                             self.RollInit, self.PitchInit, self.YawInit, 2)
+                    self.set_position_action(self.XInit, self.YInit, self.ZInit,
+                                             self.RollInit, self.PitchInit, self.YawInit, 3)
+                    self.set_position_action(self.XPlace, self.YPlace, self.ZPlace,
+                                             self.RollPlace, self.PitchPlace, self.YawPlace, 4)
                     self.set_byte_action(0, 1)
                     self.set_byte_action(0, 2)
                     self.set_byte_action(0, 3)
                     self.set_byte_action(0, 4)
                     self.set_byte_action(1, 0)
+                    self.set_double_action(self.uic.sliderSpeedAuto.value(), 0)
                     # self.serial_process_action(80)
                     self.flag_Select = True
                     self.timer.start(100)
             self.uic.btnServo.setText("Servo Off")
 
         elif self.uic.btnServo.text() == "Servo Off":
-            Data = bytes([0x02, 0x00, 0x00, 0x00])
+            Data = DATA_SERVO_OFF
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
             self.socket.send_function(frame)
             self.socket.received_function()
@@ -364,7 +441,7 @@ class MainWindow(QMainWindow):
             self.timer.stop()
             self.uic.btnServo.setText("Servo On")
 
-        self.get_position_action()
+        self.robot_data_position()
 
     def move_command_action(self, Speed_type, X, Y, Z, Rx, Ry, Rz):
         # Speed type = 1 (0x01) là vận tốc dịch chuyển
@@ -372,19 +449,18 @@ class MainWindow(QMainWindow):
         Speed_value = None
 
         if Speed_type == 0:
-            Speed_type = 1
-            Speed_value = 2000
+            Speed_value = 1000
         elif Speed_type == 1:
             Speed_value = self.uic.slider_Spe_mm.value()
         elif Speed_type == 2:
             Speed_value = self.uic.slider_Spe_deg.value()
 
-        Data_Part = bytes([0x68, 0x00])
-        Request_ID = bytes([0x02])
-        Command = bytes([0x8A, 0x00])
-        Instance = bytes([0x02, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
+        Data_Part = DATA_PART_MOVE_CARTESIAN
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_MOVE_CARTESIAN
+        Instance = INSTANCE_MOVE_CARTESIAN_STRAIGHT_ABSOLUTE
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_MOVE_CARTESIAN
 
         Data_Control_Group = bytes([0x01, 0x00, 0x00, 0x00,
                                     0x00, 0x00, 0x00, 0x00])
@@ -442,11 +518,11 @@ class MainWindow(QMainWindow):
 
     def job_select_function(self, Data_Part, Data):
         Data_Part = Data_Part.to_bytes(2, byteorder='little', signed=True)
-        Request_ID = bytes([0x03])
-        Command = bytes([0x87, 0x00])
-        Instance = bytes([0x01, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_JOB_SELECT
+        Instance = INSTANCE_JOB_SELECT
+        Attribute = ATTRIBUTE_JOB_SELECT_NAME
+        Service = SERVICE_JOB_SELECT
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -456,39 +532,39 @@ class MainWindow(QMainWindow):
         return True
 
     def start_job_function(self):
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0x04])
-        Command = bytes([0x86, 0x00])
-        Instance = bytes([0x01, 0x00])
-        Attribute = bytes([0x01])
-        Service = bytes([0x10])
-        Data = bytes([0x01, 0x00, 0x00, 0x00])
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_START_JOB
+        Instance = INSTANCE_START_JOB
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_START_JOB
+        Data = DATA_START_JOB
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
         self.socket.send_function(frame)
         self.socket.received_function()
 
-    def get_position_action(self):
+    def robot_data_position(self):
         Instance = None
         # Khi đọc vị trí thành phần Data trong Request là không có (0x00 0x00 0x00 0x00)
         # Khi đọc vị trí robot kiểu Pulse thì Instance = 1 (0x01 0x00)
         # Khi đọc vị trí robot kiểu Cartesian thì Instance = 101 (0x65 0x00)
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0xFA])
-        Command = bytes([0x75, 0x00])
-        Attribute = bytes([0x00])
-        Service = bytes([0x01])
-        Data = bytes([0x00, 0x00, 0x00, 0x00])
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_ROBOT_DATA_POSITION
+        Attribute = ATTRIBUTE_ROBOT_DATA_POSITION
+        Service = SERVICE_READ_ALL
+        Data = DATA_NONE
 
         status = 0
 
         while status < 2:
             if status == 0:
-                Instance = bytes([0x01, 0x00])
+                Instance = INSTANCE_PULSE
 
             elif status == 1:
-                Instance = bytes([0x65, 0x00])
+                Instance = INSTANCE_CARTESIAN
 
             frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -525,38 +601,16 @@ class MainWindow(QMainWindow):
 
             status += 1
 
-    def set_position_action(self, X, Y, Z, Roll, Pitch, Yaw, Ins):
-        Data_Part = bytes([0x2C, 0x00])
-        Request_ID = bytes([0xFB])
-        Command = bytes([0x7F, 0x00])
+    def set_byte_action(self, Data, Ins):
+        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
+        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
+        Data_Part = DATA_BYTE_VARIABLE
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_BYTE_VARIABLE
         Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x00])
-        Service = bytes([0x02])
-
-        Data_type = bytes([0x11, 0x00, 0x00, 0x00])
-        Data_temp_1 = bytes([0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00])
-        Data_X = X.to_bytes(4, byteorder='little', signed=True)
-        Data_Y = Y.to_bytes(4, byteorder='little', signed=True)
-        Data_Z = Z.to_bytes(4, byteorder='little', signed=True)
-        Data_Roll = Roll.to_bytes(4, byteorder='little', signed=True)
-        Data_Pitch = Pitch.to_bytes(4, byteorder='little', signed=True)
-        Data_Yaw = Yaw.to_bytes(4, byteorder='little', signed=True)
-
-        Data = []
-
-        Data.extend(Data_type)
-        Data.extend(Data_temp_1)
-        Data.extend(Data_X)
-        Data.extend(Data_Y)
-        Data.extend(Data_Z)
-        Data.extend(Data_Roll)
-        Data.extend(Data_Pitch)
-        Data.extend(Data_Yaw)
-
-        Data = bytes(Data)
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_WRITE_ALL
+        Data = Data.to_bytes(1, byteorder='little', signed=True)
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -566,13 +620,13 @@ class MainWindow(QMainWindow):
     def get_byte_action(self, Ins):
         # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
         # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
-        Data_Part = bytes([0x01, 0x00])
-        Request_ID = bytes([0xFC])
-        Command = bytes([0x7A, 0x00])
+        Data_Part = DATA_PART_BYTE_VARIABLE
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_BYTE_VARIABLE
         Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x01])
-        Service = bytes([0x01])
-        Data = bytes([0x00])
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_READ_ALL
+        Data = DATA_BYTE_VARIABLE
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
@@ -583,29 +637,72 @@ class MainWindow(QMainWindow):
 
         return value
 
-    def set_byte_action(self, Data, Ins):
-        # Ghi vị trí theo kiểu Robot Coordinate (Data type = 17)
-        # Ghi vị trí theo kiểu Robot Pulse (Data type = 0)
-        Data_Part = bytes([0x01, 0x00])
-        Request_ID = bytes([0xFD])
-        Command = bytes([0x7A, 0x00])
+    def set_position_action(self, X, Y, Z, Roll, Pitch, Yaw, Ins):
+        if Ins == -1:
+            self.move_command_action(0, int(X), int(Y), int(Z), int(Roll), int(Pitch), int(Yaw))
+        else:
+            Data_Part = DATA_PART_POSITION_VARIABLE
+            Request_ID = REQUEST_ID + 1
+            Command = CMD_POSITION_VARIABLE
+            Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+            Attribute = ATTRIBUTE_POSITION_VARIABLE
+            Service = SERVICE_WRITE_ALL
+
+            Data_type = bytes([0x11, 0x00, 0x00, 0x00])
+            Data_temp_1 = bytes([0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00])
+            Data_X = X.to_bytes(4, byteorder='little', signed=True)
+            Data_Y = Y.to_bytes(4, byteorder='little', signed=True)
+            Data_Z = Z.to_bytes(4, byteorder='little', signed=True)
+            Data_Roll = Roll.to_bytes(4, byteorder='little', signed=True)
+            Data_Pitch = Pitch.to_bytes(4, byteorder='little', signed=True)
+            Data_Yaw = Yaw.to_bytes(4, byteorder='little', signed=True)
+
+            Data = []
+
+            Data.extend(Data_type)
+            Data.extend(Data_temp_1)
+            Data.extend(Data_X)
+            Data.extend(Data_Y)
+            Data.extend(Data_Z)
+            Data.extend(Data_Roll)
+            Data.extend(Data_Pitch)
+            Data.extend(Data_Yaw)
+
+            Data = bytes(Data)
+
+            frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+            self.socket.send_function(frame)
+            self.socket.received_function()
+
+    def get_position_action(self, Ins):
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_POSITION_VARIABLE
         Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
-        Data = Data.to_bytes(1, byteorder='little', signed=True)
+        Attribute = ATTRIBUTE_POSITION_VARIABLE
+        Service = SERVICE_READ_ALL
+        Data = DATA_NONE
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
 
         self.socket.send_function(frame)
-        self.socket.received_function()
+        frame_data = self.socket.received_function()
+
+        print(frame_data)
+
+        return frame_data
 
     def set_double_action(self, Data, Ins):
-        Data_Part = bytes([0x04, 0x00])
-        Request_ID = bytes([0xFE])
-        Command = bytes([0x7C, 0x00])
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_DOUBLE_VARIABLE
         Instance = Ins.to_bytes(2, byteorder='little', signed=True)
-        Attribute = bytes([0x01])
-        Service = bytes([0x02])
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_WRITE_ALL
         Data = Data.to_bytes(4, byteorder='little', signed=True)
 
         frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
@@ -613,13 +710,48 @@ class MainWindow(QMainWindow):
         self.socket.send_function(frame)
         self.socket.received_function()
 
+    def get_double_action(self, Ins):
+        Data_Part = DATA_PART_DEFAULT
+        Request_ID = REQUEST_ID + 1
+        Command = CMD_DOUBLE_VARIABLE
+        Instance = Ins.to_bytes(2, byteorder='little', signed=True)
+        Attribute = ATTRIBUTE_FIXED
+        Service = SERVICE_READ_ALL
+        Data = DATA_NONE
+
+        frame = self.frame_data_send(Data_Part, Request_ID, Command, Instance, Attribute, Service, Data)
+
+        self.socket.send_function(frame)
+        frame_data = self.socket.received_function()
+
+        print(frame_data)
+
+        return frame_data
+
+    def init_data_position(self):
+        X = float(self.uic.txtX.text())
+        Y = float(self.uic.txtY.text())
+        Z = float(self.uic.txtZ.text())
+        Roll = float(self.uic.txtRoll.text())
+        Pitch = float(self.uic.txtPitch.text())
+        Yaw = float(self.uic.txtYaw.text())
+
+        X_ = X * 1000
+        Y_ = Y * 1000
+        Z_ = Z * 1000
+        Roll_ = Roll * 10000
+        Pitch_ = Pitch * 10000
+        Yaw_ = Yaw * 10000
+
+        self.set_position_action(X_, Y_, Z_, Roll_, Pitch_, Yaw_, -1)
+
     def go_home_action(self):
-        X_ = 185 * 1000
-        Y_ = 0
-        Z_ = 25 * 1000
-        Roll_ = 180 * 10000
-        Pitch_ = 0
-        Yaw_ = 0
+        X_ = self.XHome
+        Y_ = self.YHome
+        Z_ = self.ZHome
+        Roll_ = self.RollHome
+        Pitch_ = self.PitchHome
+        Yaw_ = self.YawHome
 
         self.move_command_action(0, int(X_), int(Y_), int(Z_), int(Roll_), int(Pitch_), int(Yaw_))
 
@@ -848,8 +980,8 @@ class MainWindow(QMainWindow):
         self.uic.txtSpeAuto.setText(str(value))
 
     def update_txt_Pulse(self):
-        Value = self.uic.txtSeralValue.text()
-        self.serial_process_action(Value)
+        value = self.uic.txtSerialValue.text()
+        self.serial_process_action(value)
 
     def display_RGB_frame(self):
         self.flag_RGB = True
@@ -933,8 +1065,8 @@ class MainWindow(QMainWindow):
         if self.uic.btnMoveJob.text() == "MOVE JOB":
             ret = self.job_select_function(7, b'MOVEJOB')
             if ret:
-                self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
-                self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
+                self.set_position_action(self.XInit, self.YInit, self.ZInit, self.RollInit, self.PitchInit, self.YawInit, 2)
+                self.set_position_action(self.XInit, self.YInit, self.ZInit, self.RollInit, self.PitchInit, self.YawInit, 3)
                 self.set_byte_action(1, 1)
                 self.start_job_function()
             self.flag_Enable_Job = True
@@ -949,7 +1081,7 @@ class MainWindow(QMainWindow):
                 self.uic.btnMoveJob.setText("RUNNING")
 
         elif self.uic.btnMoveJob.text() == "RUNNING":
-            self.set_position_action(int(self.X_), int(self.Y_), 27000,
+            self.set_position_action(int(self.X_), int(self.Y_), self.ZInit,
                                      int(self.Roll_), int(self.Pitch_), int(self.Yaw_),
                                      2)
             self.set_position_action(int(self.X_), int(self.Y_), int(self.Z_),
@@ -969,8 +1101,8 @@ class MainWindow(QMainWindow):
         elif self.uic.btnMoveJob.text() == "RUN JOB":
             self.uic.btnMoveJob.setText("MOVE JOB")
         self.flag_Enable_Job = False
-        self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 2)
-        self.set_position_action(230000, 0, 27000, 1800000, 0, 0, 3)
+        self.set_position_action(self.XInit, self.YInit, self.ZInit, self.RollInit, self.PitchInit, self.YawInit, 2)
+        self.set_position_action(self.XInit, self.YInit, self.ZInit, self.RollInit, self.PitchInit, self.YawInit, 3)
         self.set_byte_action(1, 4)
         self.set_byte_action(0, 1)
         self.set_byte_action(0, 2)
@@ -1177,7 +1309,7 @@ class MainWindow(QMainWindow):
     def update_timer(self):
         if self.flag_Select:
             if self.DEVICE_ROBOT:
-                self.get_position_action()
+                self.robot_data_position()
             self.flag_Select = False
 
         elif not self.flag_Select:
@@ -1237,18 +1369,11 @@ class MainWindow(QMainWindow):
         print("Yaw = " + str(self.Yaw_))
 
     def move_test_clicked(self):
-        X_ = self.X_
-        Y_ = self.Y_
-        Z_ = self.Z_
-        Roll_ = self.Roll_
-        Pitch_ = self.Pitch_
-        Yaw_ = self.Yaw_
-
-        self.move_command_action(0, int(X_), int(Y_), 35000,
-                                 int(Roll_), int(Pitch_), int(Yaw_))
+        self.move_command_action(0, int(self.X_), int(self.Y_), self.ZInit,
+                                 int(self.Roll_), int(self.Pitch_), int(self.Yaw_))
         time.sleep(3)
-        self.move_command_action(0, int(X_), int(Y_), int(Z_),
-                                 int(Roll_), int(Pitch_), int(Yaw_))
+        self.move_command_action(0, int(self.X_), int(self.Y_), int(self.Z_),
+                                 int(self.Roll_), int(self.Pitch_), int(self.Yaw_))
 
     def test_job_clicked(self):
         ret = self.job_select_function(7, b'MOVEJOB')
@@ -1557,5 +1682,5 @@ class SerialProcess(QThread):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showMinimized()
     sys.exit(app.exec())
