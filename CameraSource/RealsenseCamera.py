@@ -65,7 +65,7 @@ class RealsenseCamera:
     def pixel_to_point(self, u, v):
         _, _, _, depth_intrinsic, depth_frame, _ = self.get_frame_stream()
 
-        # Lấy giá trị độ sâu tại điểm ảnh (u,v)
+        # Get distance at pixel point (u,v)
         depth_value = depth_frame.get_distance(u, v)
         # pixel = (u, v)
         # distance = depth_frame[pixel[1], pixel[0]]
