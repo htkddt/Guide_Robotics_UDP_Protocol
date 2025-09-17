@@ -401,7 +401,8 @@ class MainWindow(QMainWindow):
         Request_ID = REQUEST_ID + 1
         Command = CMD_SERVO
         Instance = INSTANCE_SERVO
-        Attribute = ATTRIBUTE_SERVO
+        #Attribute = ATTRIBUTE_SERVO
+        Attribute = ATTRIBUTE_FIXED
         Service = SERVICE_SERVO
 
         if self.uic.btnServo.text() == "Servo On":
