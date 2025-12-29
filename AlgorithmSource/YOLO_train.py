@@ -8,4 +8,4 @@ model = YOLO("../yolov8n.pt")
 
 if __name__ == '__main__':
     # Train model
-    results = model.train(data="mydataset.yaml", epochs=30, device="0", batch=2)
+    results = model.train(data="mydataset.yaml", epochs=30, device='cpu', batch=2)
