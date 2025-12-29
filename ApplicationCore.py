@@ -1,3 +1,4 @@
+import sys
 import os
 import struct
 import socket
@@ -12,8 +13,8 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from CameraSource.RealsenseCamera import *
-from ObjectProcess.YoloDetection import *
-from ObjectProcess.YoloSegmentation import *
+# from ObjectProcess.YoloDetection import *
+# from ObjectProcess.YoloSegmentation import *
 from ApplicationUI import MainWindowUI
 # from QtDesignerUI.Guide_htkddt import Ui_MainWindow
 
@@ -241,8 +242,8 @@ class MainWindow(QMainWindow):
     def device_io_status(self, status):
         if status:  # Init Thread if status switch button is True
             # Camera
-            self.camera = CameraThread()
-            self.camera.image.connect(self.update_frame)
+            # self.camera = CameraThread()
+            # self.camera.image.connect(self.update_frame)
 
             # Serial
             # self.serial = SerialProcess()
@@ -1467,168 +1468,168 @@ class RobotSocket(QThread):
         return frame_data
 
 
-class CameraThread(QThread):
-    image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
+# class CameraThread(QThread):
+#     image = pyqtSignal(bool, bool, np.ndarray, np.ndarray, np.ndarray, int, int, float)
 
-    def __init__(self):
-        super(CameraThread, self).__init__()
-        self.rs = RealsenseCamera()
-        self.yoloDetect = YoloDetection()
-        self.yoloSegment = YoloSegmentation()
-        print("Camera Finished Init")
+#     def __init__(self):
+#         super(CameraThread, self).__init__()
+#         self.rs = RealsenseCamera()
+#         self.yoloDetect = YoloDetection()
+#         self.yoloSegment = YoloSegmentation()
+#         print("Camera Finished Init")
 
-    def run(self):
-        binary_frame = None
-        obj = None
-        flag_last_id = False
-        point_center = None
-        u = 0
-        v = 0
-        angle = 0
+#     def run(self):
+#         binary_frame = None
+#         obj = None
+#         flag_last_id = False
+#         point_center = None
+#         u = 0
+#         v = 0
+#         angle = 0
 
-        width = 640
-        height = 480
-        black_frame = np.zeros((height, width), dtype=np.uint8)
+#         width = 640
+#         height = 480
+#         black_frame = np.zeros((height, width), dtype=np.uint8)
 
-        while self.running:
-            ret, color_frame, depth_frame, _, _, _ = self.rs.get_frame_stream()
+#         while self.running:
+#             ret, color_frame, depth_frame, _, _, _ = self.rs.get_frame_stream()
 
-            if ret:
-                # Vẽ vùng làm việc
-                mean = 120
-                min_X = 118
-                max_X = 237
-                min_Y = 172
-                max_Y = 279
+#             if ret:
+#                 # Vẽ vùng làm việc
+#                 mean = 120
+#                 min_X = 118
+#                 max_X = 237
+#                 min_Y = 172
+#                 max_Y = 279
 
-                tl_point = (min_X, min_Y)
-                br_point = (max_X, max_Y)
-                cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 2)
+#                 tl_point = (min_X, min_Y)
+#                 br_point = (max_X, max_Y)
+#                 cv2.rectangle(color_frame, tl_point, br_point, (0, 0, 0), 2)
 
-                binary_float32 = self.yoloSegment.getSegment(color_frame)
+#                 binary_float32 = self.yoloSegment.getSegment(color_frame)
 
-                if binary_float32 is None:
-                    binary_frame = black_frame
-                    obj = False
-                else:
-                    binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-                    binary_frame = binary_normalized.astype(np.uint8)
-                    obj = True
+#                 if binary_float32 is None:
+#                     binary_frame = black_frame
+#                     obj = False
+#                 else:
+#                     binary_normalized = cv2.normalize(binary_float32, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+#                     binary_frame = binary_normalized.astype(np.uint8)
+#                     obj = True
 
-                if self.flag_Detect_YOLO:
-                    color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(
-                        color_frame, tl_point, br_point)
+#                 if self.flag_Detect_YOLO:
+#                     color_frame, last_id, _, point_center, top_left, bottom_right, _ = self.yoloDetect.getObject(
+#                         color_frame, tl_point, br_point)
 
-                    if last_id is None:
-                        flag_last_id = False
+#                     if last_id is None:
+#                         flag_last_id = False
 
-                    else:
-                        if point_center[0] > mean:
-                            contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                            for c in contour_box:
-                                area = cv2.contourArea(c)
-                                if area < 1000:
-                                    continue
-                                else:
-                                    M = cv2.moments(c)
-                                    cX = int(M["m10"] / M["m00"])
-                                    cY = int(M["m01"] / M["m00"])
+#                     else:
+#                         if point_center[0] > mean:
+#                             contour_box, _ = cv2.findContours(binary_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#                             for c in contour_box:
+#                                 area = cv2.contourArea(c)
+#                                 if area < 1000:
+#                                     continue
+#                                 else:
+#                                     M = cv2.moments(c)
+#                                     cX = int(M["m10"] / M["m00"])
+#                                     cY = int(M["m01"] / M["m00"])
 
-                                    if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
-                                        angle, _ = self.getOrientation(c, color_frame)
-                                        angle = (angle * 180 / math.pi) + 90.0
+#                                     if (cX > min_X) & (cX < max_X) & (cY > min_Y) & (cY < max_Y):
+#                                         angle, _ = self.getOrientation(c, color_frame)
+#                                         angle = (angle * 180 / math.pi) + 90.0
 
-                                        if angle > 90.0:
-                                            angle = angle - 180
+#                                         if angle > 90.0:
+#                                             angle = angle - 180
 
-                            flag_last_id = True
+#                             flag_last_id = True
 
-                        else:
-                            flag_last_id = False
+#                         else:
+#                             flag_last_id = False
 
-                elif self.flag_Detect_COLOR:
-                    color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
-                    color_frame, u, v = ColorDetection.COLOR_objectdetection(color_frame)
-                    color_frame = cv2.cvtColor(color_frame, cv2.COLOR_RGB2BGR)
-                    if (u is None) & (v is None):
-                        u = 0
-                        v = 0
+#                 elif self.flag_Detect_COLOR:
+#                     color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
+#                     color_frame, u, v = ColorDetection.COLOR_objectdetection(color_frame)
+#                     color_frame = cv2.cvtColor(color_frame, cv2.COLOR_RGB2BGR)
+#                     if (u is None) & (v is None):
+#                         u = 0
+#                         v = 0
 
-                else:
-                    flag_last_id = False
+#                 else:
+#                     flag_last_id = False
 
-                if flag_last_id:
-                    u = point_center[0]
-                    v = point_center[1]
-                else:
-                    u = 0
-                    v = 0
-                    angle = 0
+#                 if flag_last_id:
+#                     u = point_center[0]
+#                     v = point_center[1]
+#                 else:
+#                     u = 0
+#                     v = 0
+#                     angle = 0
 
-                self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, u, v, angle)
+#                 self.image.emit(obj, flag_last_id, color_frame, binary_frame, depth_frame, u, v, angle)
 
-    def matrix(self):
-        _, _, _, matrix, _, dist = self.rs.get_frame_stream()
-        depth_intrinsic = np.array([[matrix.fx, 0, matrix.ppx],
-                                    [0, matrix.fy, matrix.ppy],
-                                    [0, 0, 1]])
-        return depth_intrinsic, dist
+#     def matrix(self):
+#         _, _, _, matrix, _, dist = self.rs.get_frame_stream()
+#         depth_intrinsic = np.array([[matrix.fx, 0, matrix.ppx],
+#                                     [0, matrix.fy, matrix.ppy],
+#                                     [0, 0, 1]])
+#         return depth_intrinsic, dist
 
-    def point(self, u, v):
-        X, Y, Z, depth = self.rs.pixel_to_point(u, v)
-        return X, Y, Z, depth
+#     def point(self, u, v):
+#         X, Y, Z, depth = self.rs.pixel_to_point(u, v)
+#         return X, Y, Z, depth
 
-    def drawAxis(self, img, p_, q_, colour, scale):
-        p = list(p_)
-        q = list(q_)
+#     def drawAxis(self, img, p_, q_, colour, scale):
+#         p = list(p_)
+#         q = list(q_)
 
-        angle = math.atan2(p[1] - q[1], p[0] - q[0])  # angle in radians
-        hypotenuse = math.sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
+#         angle = math.atan2(p[1] - q[1], p[0] - q[0])  # angle in radians
+#         hypotenuse = math.sqrt((p[1] - q[1]) * (p[1] - q[1]) + (p[0] - q[0]) * (p[0] - q[0]))
 
-        # Here we lengthen the arrow by a factor of scale
-        q[0] = p[0] - scale * hypotenuse * math.cos(angle)
-        q[1] = p[1] - scale * hypotenuse * math.sin(angle)
-        cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
+#         # Here we lengthen the arrow by a factor of scale
+#         q[0] = p[0] - scale * hypotenuse * math.cos(angle)
+#         q[1] = p[1] - scale * hypotenuse * math.sin(angle)
+#         cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
 
-        # create the arrow hooks
-        p[0] = q[0] + 9 * math.cos(angle + math.pi / 4)
-        p[1] = q[1] + 9 * math.sin(angle + math.pi / 4)
-        cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
+#         # create the arrow hooks
+#         p[0] = q[0] + 9 * math.cos(angle + math.pi / 4)
+#         p[1] = q[1] + 9 * math.sin(angle + math.pi / 4)
+#         cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
 
-        p[0] = q[0] + 9 * math.cos(angle - math.pi / 4)
-        p[1] = q[1] + 9 * math.sin(angle - math.pi / 4)
-        cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
+#         p[0] = q[0] + 9 * math.cos(angle - math.pi / 4)
+#         p[1] = q[1] + 9 * math.sin(angle - math.pi / 4)
+#         cv2.line(img, (int(p[0]), int(p[1])), (int(q[0]), int(q[1])), colour, 1, cv2.LINE_AA)
 
-    def getOrientation(self, pts, img):
-        sz = len(pts)
-        data_pts = np.empty((sz, 2), dtype=np.float64)
+#     def getOrientation(self, pts, img):
+#         sz = len(pts)
+#         data_pts = np.empty((sz, 2), dtype=np.float64)
 
-        for j in range(data_pts.shape[0]):
-            data_pts[j, 0] = pts[j, 0, 0]
-            data_pts[j, 1] = pts[j, 0, 1]
+#         for j in range(data_pts.shape[0]):
+#             data_pts[j, 0] = pts[j, 0, 0]
+#             data_pts[j, 1] = pts[j, 0, 1]
 
-        # Perform PCA analysis
-        mean = np.empty(0)
-        mean, eigenvectors, eigenvalues = cv2.PCACompute2(data_pts, mean)
+#         # Perform PCA analysis
+#         mean = np.empty(0)
+#         mean, eigenvectors, eigenvalues = cv2.PCACompute2(data_pts, mean)
 
-        # Store the center of the object
-        cntr = (int(mean[0, 0]), int(mean[0, 1]))
-        # cv2.circle(img, cntr, 3, (255, 0, 255), 2)
+#         # Store the center of the object
+#         cntr = (int(mean[0, 0]), int(mean[0, 1]))
+#         # cv2.circle(img, cntr, 3, (255, 0, 255), 2)
 
-        p1 = (cntr[0] + 0.02 * eigenvectors[0, 0] * eigenvalues[0, 0],
-              cntr[1] + 0.02 * eigenvectors[0, 1] * eigenvalues[0, 0])
-        p2 = (cntr[0] - 0.02 * eigenvectors[1, 0] * eigenvalues[1, 0],
-              cntr[1] - 0.02 * eigenvectors[1, 1] * eigenvalues[1, 0])
+#         p1 = (cntr[0] + 0.02 * eigenvectors[0, 0] * eigenvalues[0, 0],
+#               cntr[1] + 0.02 * eigenvectors[0, 1] * eigenvalues[0, 0])
+#         p2 = (cntr[0] - 0.02 * eigenvectors[1, 0] * eigenvalues[1, 0],
+#               cntr[1] - 0.02 * eigenvectors[1, 1] * eigenvalues[1, 0])
 
-        self.drawAxis(img, cntr, p1, (255, 0, 0), 3)
-        self.drawAxis(img, cntr, p2, (255, 255, 255), 7)
+#         self.drawAxis(img, cntr, p1, (255, 0, 0), 3)
+#         self.drawAxis(img, cntr, p2, (255, 255, 255), 7)
 
-        angle = math.atan2(eigenvectors[0, 1], eigenvectors[0, 0])  # orientation in radians
+#         angle = math.atan2(eigenvectors[0, 1], eigenvectors[0, 0])  # orientation in radians
 
-        if cntr[0] < p1[0]:
-            angle = -angle
+#         if cntr[0] < p1[0]:
+#             angle = -angle
 
-        return angle, cntr
+#         return angle, cntr
 
 
 class SerialProcess(QThread):
